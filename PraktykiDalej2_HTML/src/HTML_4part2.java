@@ -57,7 +57,7 @@ public class HTML_4part2 {
 				pomString=linkHref+zliczString+"/";
 				System.out.println("\nKTORA STRONA\t"+pomString);
 				budownictwoDoc = Jsoup.connect(pomString).timeout(0).get();
-					
+				//budownictwoString = budownictwoDoc.toString();/////	
 			//-------------------------------------------------------------------------------
 				Element content2 = budownictwoDoc.getElementById("content");
 				Elements links2 = content2.getElementsByTag("span");
@@ -66,13 +66,18 @@ public class HTML_4part2 {
 					String linkText2 = link2.text();
 												  
 					budownictwoDoc = Jsoup.connect(pomString).timeout(0).get();
-						
+					
+					
 					Element content3 = budownictwoDoc.getElementById("content");
 					Elements links3 = content3.getElementsByTag("a");
 					for (Element link4 : links3)//POCZATEK:pobieranie linków do firm 
 					{
 						String linkHref4 = link4.attr("href");
 						String linkText4 = link4.text();
+						
+						budownictwoDoc = Jsoup.connect(linkHref4).timeout(0).get();
+						budownictwoString = budownictwoDoc.toString();/////	
+						
 						if(linkText4.equals(linkText2))
 						{
 							System.out.println("\n\t"+linkText4+":\t\t"+linkHref4+"\n");
@@ -163,6 +168,24 @@ public class HTML_4part2 {
 								if(ostatni.equals("Adres WWW: "))
 								{
 									adres_www[j]=linkText5;
+									if((adres_www[j]==null)||(adres_www[j].equals("")))
+									{ 
+										String pom="";
+										Pattern pattern = Pattern.compile("(var url=\"url(.){1,}html\";)");
+										Matcher matcherpattern = pattern.matcher(budownictwoString);
+										matcherpattern.reset();
+										boolean found = matcherpattern.find();
+										if (found)
+										{
+											do
+											{
+												pom=matcherpattern.group();
+												pom=pom.replaceAll("var url=\"url.odi.pl/","");
+												pom=pom.replaceAll(".html\";","");
+											}while(matcherpattern.find());
+										}
+										adres_www[j]=pom;
+									}
 									//System.out.print(adres_www[j]+" ");
 								}
 //								else if(adres_www[j]==null);
@@ -195,6 +218,8 @@ public class HTML_4part2 {
 								ostatni=linkText5;
 							}
 						}
+
+						
 					try{
 						str=nazwa_firmy[j]+";"+wojewodztwo[j]+";"+miejscowosc[j]+";"+ulica[j]+";"+kod_pocztowy[j]+";"+osoba_kontaktowa[j]+";"+telefon[j]+";"+tel_kom[j]+";"+adres_www[j]+";"+nip[j]+";"+regon[j]+";"+zatrudnienie[j]+";";
 						str=str.replaceAll("null;null;null;null;null;null;null;null;null;null;null;null;","");
