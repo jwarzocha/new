@@ -14,7 +14,7 @@ import org.jsoup.select.Elements;
 public class HTML_4part2 {
 		
 	public static void main(String args[]) throws IOException{
-			
+		long start=System.currentTimeMillis();	
 		String nazwa_firmy[]= new String[1150000];
 		String wojewodztwo[]= new String[1150000];
 		String miejscowosc[]= new String[1150000]; 
@@ -200,6 +200,7 @@ public class HTML_4part2 {
 						str=str.replaceAll("null;null;null;null;null;null;null;null;null;null;null;null;","");
 						System.out.print("\t"+str+"");
 						str2=str2+str;
+						str2=str2.replaceAll("null","");
 					}catch(IndexOutOfBoundsException e){System.out.println(e);}	
 						j++;
 						 
@@ -209,9 +210,7 @@ public class HTML_4part2 {
 					//System.out.println("\n\tSTRING:\t"+str2+"\n");
 					
 //					System.out.println(str2);
-//					PrintWriter firmy = new PrintWriter("firmybudownictwo.csv");
-//					firmy.println(str2);
-//					firmy.close();
+					
 				}//KONIEC:pobieranie nazw firm 
 
 				
@@ -222,11 +221,14 @@ public class HTML_4part2 {
 //-------------------------------------------------------------------------------			
 			i++;
 			System.out.println("\n NASTEPNY DZIAL \n");
-			if((linkText.equals("Inne ...")))break;
+			if((linkText.equals("Architektura")))break;//("Inne ...")))break;
 		}//KONIEC:pobieranie nazw i linków do działów od Architektura do Inne
+		PrintWriter firmy = new PrintWriter("firmybudownictwo.csv");
+		firmy.println(str2);
+		firmy.close();
 		
-		
-		
+		long stop=System.currentTimeMillis();
+		System.out.println("\n\n\nCzas wykonania:"+(stop-start));
 		
 		//Napis końcowy
 		System.out.println("kk");
