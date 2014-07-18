@@ -1,3 +1,4 @@
+import java.io.IOError;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.regex.Matcher;
@@ -76,30 +77,35 @@ public class HTML {
 
 							adresStronyWojewodztwa=adresStronyWojewodztwa.replaceAll("www.", "");
 							
-							//wyrazenie regularne do kodu pocztowego adresStronyWojewodztwa+"[0-9]{2}-[0-9]{3}"
-							Pattern patternKodPocztowy = Pattern.compile("[0-9]{2}-[0-9]{3}");
-							Matcher matcherpatternKodPocztowy = patternKodPocztowy.matcher(linkText3);
-							matcherpatternKodPocztowy.reset();
-							boolean found2 = matcherpatternKodPocztowy.find();
-							if(found2){
-								if(!linkText3.equals("00-000.pl")){
+							if(linkText3.length()>2)
+							{
+								//wyrazenie regularne do kodu pocztowego adresStronyWojewodztwa+"[0-9]{2}-[0-9]{3}"
+								Pattern patternKodPocztowy = Pattern.compile("[0-9]{2}-[0-9]{3}");
+								Matcher matcherpatternKodPocztowy = patternKodPocztowy.matcher(linkText3);
+								matcherpatternKodPocztowy.reset();
+								boolean found2 = matcherpatternKodPocztowy.find();
+								if(found2){
+									if(!linkText3.equals("00-000.pl")){
+										System.out.println("RAZ\ttext "+linkText3+"\thref "+linkHref3);
+										str=str+linkText3+";";
+									}
+								}
+							
+							
+								//wyrazenie regularne do miasta
+								String pom=adresStronyWojewodztwa+BezPolskichZnakow(linkText3).toLowerCase();
+								pom=pom.replaceAll(" ", "_");
+								Pattern patternMiasto = Pattern.compile(pom);
+								Matcher matcherpatternMiasto = patternMiasto.matcher(linkHref3);
+								matcherpatternMiasto.reset();
+								boolean found = matcherpatternMiasto.find();
+								if(found) 
+								{	zliczMiasta++;//tutaj musi być bo tu są znalezione
 									System.out.println("RAZ\ttext "+linkText3+"\thref "+linkHref3);
-									str=str+linkText3+";";
+									str=str+linkText3+";\r\n";
 								}
 							}
 							
-							//wyrazenie regularne do miasta
-							String pom=adresStronyWojewodztwa+BezPolskichZnakow(linkText3).toLowerCase();
-							pom=pom.replaceAll(" ", "_");
-							Pattern patternMiasto = Pattern.compile(pom);
-							Matcher matcherpatternMiasto = patternMiasto.matcher(linkHref3);
-							matcherpatternMiasto.reset();
-							boolean found = matcherpatternMiasto.find();
-							if(found) 
-							{	zliczMiasta++;//tutaj musi być bo tu są znalezione
-								System.out.println("RAZ\ttext "+linkText3+"\thref "+linkHref3);
-								str=str+linkText3+";\r\n";
-							}
 
 						
 							if(zliczMiasta==50)break;
@@ -116,13 +122,12 @@ public class HTML {
 
 //-----------------------------------------------------------------------------------------------------
 		
-//		Pattern pattern = Pattern.compile("[0-9]{2};");
-//		Matcher matcherpattern = pattern.matcher(str);
-//		matcherpattern.reset();
-//		boolean found2 = matcherpattern.find();
-//		if(found2){
-//			matcherpattern.group();
-//		}
+
+//		Pattern patternSmiec = Pattern.compile("[0-9]{1};");
+//		Matcher matcherpatternSmiec = patternSmiec.matcher(str);
+//		matcherpatternSmiec.reset();
+//		boolean foundSmiec = matcherpatternSmiec.find();
+//		if(foundSmiec)str=str.replaceAll(matcherpatternSmiec.group(),"");
 		System.out.println(str);
 		
 		PrintWriter firmy = new PrintWriter("kody_pocztowe_i_miasta.csv");
