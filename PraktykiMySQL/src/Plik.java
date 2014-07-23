@@ -1,5 +1,6 @@
 
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -8,6 +9,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import au.com.bytecode.opencsv.CSVReader;
 
@@ -17,14 +20,17 @@ public class Plik {
 	static final String DB_URL = "jdbc:mysql://localhost/druga_baza";
 
 	//user and password
-	static final String USER = "nazwa_user";
-	static final String PASS = "haslo_usera";
-	   
+	static final String USER = "user";
+	static final String PASS = "password";
+
+	
 	public static void main(String[] args) throws IOException 
 	{
 		CSVReader reader = new CSVReader(new FileReader("firmybudownictwo.csv"));
 	    String[] row;
 	    String str = "";
+	    String str2 = "('";
+	    int zlicz=0,zlicz2=0;
 	    while ((row = reader.readNext()) != null) 
 	    {
 	    	for (int i = 0; i < row.length; i++) 
@@ -32,17 +38,33 @@ public class Plik {
 	            if(i==0)str=str+row[i];
 	            else str=str+""+row[i];
 	        }
-	    	str=str +"\r\n";
+	    	str=str +"\r\n";zlicz++;
 	    }
-	    str = str.replaceAll(";\r\n","'),\r\n('");
-	    int dlugosc = str.length() - 7;
-	    str= str.substring(0, dlugosc);
-	    str = str.replaceAll(";" , "','");
-	    str = str + ";"; 
-	    int pom=str.indexOf("regon'),");
-	    str=str.substring(pom+10);
-		System.out.println(str);
+	    String sprawdz = str;
+	    //                          nazwafirmy;   wojewodztwo;                           miasto;                                adres;                                       kod pocztowy;            osoba kontaktow;                       telefon;                       tel kom;           adres www;                                    nip;       regon;    zatrudnionych;
+		Pattern pattern = Pattern.compile(".{1,};[\\-\\s\\.a-zA-ZąćęłńóśźżĄĘŁŃÓŚŹŻ]{0,};[\\-\\s\\.a-zA-ZąćęłńóśźżĄĘŁŃÓŚŹŻ]{0,};[\\-\\s\\.\\/a-zA-ZąćęłńóśźżĄĘŁŃÓŚŹŻ0-9]{0,};([0-9]{2}-[0-9]{3}){0,};[\\-\\s\\.a-zA-ZąćęłńóśźżĄĘŁŃÓŚŹŻ]{0,};[\\/\\(\\)\\.\\+\\s\\-0-9]{0,};[\\/\\(\\)\\.\\+\\s\\-0-9]{0,};([\\-\\s\\.a-zA-Z0-9]{1,}\\.[a-z]{2,3}){0,1};[0-9]{0,};[0-9]{0,};([0-9]{1,}-[0-9]{1,}){0,};\r\n");
+		Matcher matcherpattern = pattern.matcher(sprawdz);
+	    matcherpattern.reset();
+	    boolean found = matcherpattern.find();
+	    if (found){
+	    	do{
+	    		str2 = str2 + matcherpattern.group();
+	    		str = str.replace(matcherpattern.group(),"");//pasujące usuwamy tak aby w str zostały tylko nie pasujące 
+	    		zlicz2++;
+	    	}while(matcherpattern.find());
+	    }
+
+	    System.out.println(zlicz+"\t"+zlicz2);
+	    str2 = str2.replaceAll(";\r\n","'),\r\n('");
+	    int dlugosc = str2.length() - 5;
+	    str2= str2.substring(0, dlugosc);
+	    str2 = str2.replaceAll(";" , "','");
+	    str2 = str2 + ";";
+	  //  System.out.println(str);
 		
+	    FileWriter f= new FileWriter("niewczytane.csv");
+		f.write((str));
+		f.close();
 		
 		Connection conn = null;
 		Statement stmt = null;
@@ -61,7 +83,7 @@ public class Plik {
 			
 			//begin insert
 			sql = "INSERT INTO firmy (nazwa_firmy, wojewodztwo, miejscowosc, ulica, kod_pocztowy, osoba_kontaktowa, telefon, tel_kom, adres_www, nip, regon, zatrudnienie)"+
-			"VALUES"+str;               
+			"VALUES"+str2;               
 			
 			stmt.executeUpdate(sql);
 			System.out.println("insert");	
