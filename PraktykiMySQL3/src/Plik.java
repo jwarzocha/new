@@ -19,8 +19,8 @@ public class Plik {
 	static final String DB_URL = "jdbc:mysql://localhost/druga_baza";
 
 	//user and password
-	static final String USER = "mysql";
-	static final String PASS = "mysql";
+	static final String USER = "user";
+	static final String PASS = "password";
 
 	
 	public static void main(String[] args) throws IOException 
