@@ -1,5 +1,6 @@
 
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -18,8 +19,8 @@ public class Plik {
 	static final String DB_URL = "jdbc:mysql://localhost/druga_baza";
 
 	//user and password
-	static final String USER = "user";
-	static final String PASS = "password";
+	static final String USER = "mysql";
+	static final String PASS = "mysql";
 
 	
 	public static void main(String[] args) throws IOException 
@@ -31,6 +32,7 @@ public class Plik {
 		
         String str = "";
 	    String str2 = "";
+	    String bledyPrzyWalidacji = "";
 	    int zlicz=0;
         
         CsvReader csvReader = new CsvReader("firmybudownictwo.csv");
@@ -57,8 +59,15 @@ public class Plik {
 		}
 
 		csvReader.close();
+		
+		
+        bledyPrzyWalidacji = "powód błędu,nazwa_firmy,wojewodztwo,"+
+							"miejscowosc,ulica,"+
+							"kod_pocztowy,osoba_kontaktowa,"+
+							"telefon,tel_kom,"+
+							"adres_www,nip,"+
+							"regon,zatrudnienie,\r\n";
         
- 
         
 //----------------SPRAWDZANIE KODÓW POCZTOWYCH--------------------------------------------------------	    
 	     
@@ -71,6 +80,14 @@ public class Plik {
 		    boolean found = matcherpattern.find();
 		    if (!found){
 		    	do{
+		    		bledyPrzyWalidacji = bledyPrzyWalidacji + "zły kod pocztowy,"+
+		    				firmy[i].nazwa_firmy+","+firmy[i].wojewodztwo+","+
+							firmy[i].miejscowosc+","+firmy[i].ulica+","+
+							firmy[i].kod_pocztowy+","+firmy[i].osoba_kontaktowa+","+
+							firmy[i].telefon+","+firmy[i].tel_kom+","+
+							firmy[i].adres_www+","+firmy[i].nip+","+
+							firmy[i].regon+","+firmy[i].zatrudnienie+",\r\n";
+		    		
 		    		firmy[i].kod_pocztowy="";
 		    		//System.out.println(i+"\t"+firmy[i].kod_pocztowy);
 		    	}while(matcherpattern.find());
@@ -91,6 +108,13 @@ public class Plik {
 		    boolean found = matcherpattern.find();
 		    if (!found){
 		    	do{
+		    		bledyPrzyWalidacji = bledyPrzyWalidacji + "zły adres www,"+
+		    				firmy[i].nazwa_firmy+","+firmy[i].wojewodztwo+","+
+							firmy[i].miejscowosc+","+firmy[i].ulica+","+
+							firmy[i].kod_pocztowy+","+firmy[i].osoba_kontaktowa+","+
+							firmy[i].telefon+","+firmy[i].tel_kom+","+
+							firmy[i].adres_www+","+firmy[i].nip+","+
+							firmy[i].regon+","+firmy[i].zatrudnienie+",\r\n";
 		    		firmy[i].adres_www="";
 		    		//System.out.println(i+"\t"+firmy[i].adres_www);
 		    	}while(matcherpattern.find());
@@ -98,7 +122,16 @@ public class Plik {
 		    
 	    }//end:for(int i=0;i<firmy.length;i++)	    
 	    
-
+//--------------ZAPISYWANIE BŁĘDNYCH WIERSZY DO PLIKU------------------------------------------
+	    
+	    FileWriter f= new FileWriter("niewczytane.csv");
+		f.write((bledyPrzyWalidacji));
+		f.close(); 
+	    
+	    
+		//System.out.println(bledyPrzyWalidacji);
+	    
+	    
 
 //---------------WRZUCANIE DANYCH DO BAZY DANYCH----------------------------------------------	
 	    
