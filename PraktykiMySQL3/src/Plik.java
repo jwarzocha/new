@@ -122,6 +122,283 @@ public class Plik {
 		    }
 		    
 	    }//end:for(int i=0;i<firmy.length;i++)	    
+
+	    
+	    
+	    
+//----------------SPRAWDZANIE WOJEWODZTWA--------------------------------------------------------	    
+	    System.out.println("----------------SPRAWDZANIE WOJEWODZTWA---------------------");
+	    for(int i=0;i<zlicz;i++)
+	    {
+	    	Pattern pattern = Pattern.compile("(([\\-a-zA-ZąćęłńóśźżĄĘŁŃÓŚŹŻ]{1,})|(\\A\\z))");
+	    	Matcher matcherpattern = pattern.matcher(firmy[i].wojewodztwo);
+		    matcherpattern.reset();
+		    boolean found = matcherpattern.find();
+		    if (!found){
+		    	do{
+		    		bledyPrzyWalidacji = bledyPrzyWalidacji + "złe województwo,"+
+		    				firmy[i].nazwa_firmy+","+firmy[i].wojewodztwo+","+
+							firmy[i].miejscowosc+","+firmy[i].ulica+","+
+							firmy[i].kod_pocztowy+","+firmy[i].osoba_kontaktowa+","+
+							firmy[i].telefon+","+firmy[i].tel_kom+","+
+							firmy[i].adres_www+","+firmy[i].nip+","+
+							firmy[i].regon+","+firmy[i].zatrudnienie+",\r\n";
+		    		System.out.println(i+"\t"+firmy[i].wojewodztwo);
+		    		firmy[i].wojewodztwo="";
+		    		
+		    	}while(matcherpattern.find());
+		    }
+		    
+	    }//end:for(int i=0;i<firmy.length;i++)		    
+	    
+	    
+	    
+	    
+	    
+//----------------SPRAWDZANIE MIASTA--------------------------------------------------------	    
+	    System.out.println("----------------SPRAWDZANIE MIASTA---------------------");
+	    for(int i=0;i<zlicz;i++)
+	    {
+	    	Pattern pattern = Pattern.compile("(([\\-a-zA-ZąćęłńóśźżĄĘŁŃÓŚŹŻ]{1,})|(\\A\\z))");
+	    	Matcher matcherpattern = pattern.matcher(firmy[i].miejscowosc);
+		    matcherpattern.reset();
+		    boolean found = matcherpattern.find();
+		    if (!found){
+		    	do{
+		    		bledyPrzyWalidacji = bledyPrzyWalidacji + "złe miasto,"+
+		    				firmy[i].nazwa_firmy+","+firmy[i].wojewodztwo+","+
+							firmy[i].miejscowosc+","+firmy[i].ulica+","+
+							firmy[i].kod_pocztowy+","+firmy[i].osoba_kontaktowa+","+
+							firmy[i].telefon+","+firmy[i].tel_kom+","+
+							firmy[i].adres_www+","+firmy[i].nip+","+
+							firmy[i].regon+","+firmy[i].zatrudnienie+",\r\n";
+		    		System.out.println(i+"\t"+firmy[i].miejscowosc);
+		    		firmy[i].miejscowosc="";
+		    		
+		    	}while(matcherpattern.find());
+		    }
+		    
+	    }//end:for(int i=0;i<firmy.length;i++)		    
+	    
+
+	    
+	    
+	    
+	    
+	    
+//----------------SPRAWDZANIE ULICY--------------------------------------------------------	    
+	    System.out.println("----------------SPRAWDZANIE ULICY---------------------");
+	    for(int i=0;i<zlicz;i++)
+	    {
+	    	Pattern pattern = Pattern.compile("((([\\ \\.\\'\\-a-zA-ZąćęłńóśźżĄĘŁŃÓŚŹŻ]{1,}))|(\\A\\z))");
+	    	Matcher matcherpattern = pattern.matcher(firmy[i].ulica);
+		    matcherpattern.reset();
+		    boolean found = matcherpattern.find();
+		    if (!found){
+		    	do{
+		    		bledyPrzyWalidacji = bledyPrzyWalidacji + "zła ulica,"+
+		    				firmy[i].nazwa_firmy+","+firmy[i].wojewodztwo+","+
+							firmy[i].miejscowosc+","+firmy[i].ulica+","+
+							firmy[i].kod_pocztowy+","+firmy[i].osoba_kontaktowa+","+
+							firmy[i].telefon+","+firmy[i].tel_kom+","+
+							firmy[i].adres_www+","+firmy[i].nip+","+
+							firmy[i].regon+","+firmy[i].zatrudnienie+",\r\n";
+		    		System.out.println(i+"\t"+firmy[i].ulica);
+		    		firmy[i].ulica="";
+		    		
+		    	}while(matcherpattern.find());
+		    }
+		    
+	    }//end:for(int i=0;i<firmy.length;i++)	
+	    
+	    
+	    
+	    
+	    
+	    
+//----------------SPRAWDZANIE OSOBY KONTAKTOWEJ--------------------------------------------------------	    
+	    System.out.println("----------------SPRAWDZANIE OSOBY KONTAKTOWEJ---------------------");
+	    for(int i=0;i<zlicz;i++)
+	    {
+	    	Pattern pattern = Pattern.compile("((([\\ \\.\\\\-a-zA-ZąćęłńóśźżĄĘŁŃÓŚŹŻ]{1,}))|(\\A\\z))");
+	    	Matcher matcherpattern = pattern.matcher(firmy[i].osoba_kontaktowa);
+		    matcherpattern.reset();
+		    boolean found = matcherpattern.find();
+		    if (!found){
+		    	do{
+		    		bledyPrzyWalidacji = bledyPrzyWalidacji + "zła osoba kontaktowa,"+
+		    				firmy[i].nazwa_firmy+","+firmy[i].wojewodztwo+","+
+							firmy[i].miejscowosc+","+firmy[i].ulica+","+
+							firmy[i].kod_pocztowy+","+firmy[i].osoba_kontaktowa+","+
+							firmy[i].telefon+","+firmy[i].tel_kom+","+
+							firmy[i].adres_www+","+firmy[i].nip+","+
+							firmy[i].regon+","+firmy[i].zatrudnienie+",\r\n";
+		    		System.out.println(i+"\t"+firmy[i].osoba_kontaktowa);
+		    		firmy[i].osoba_kontaktowa="";
+		    		
+		    	}while(matcherpattern.find());
+		    }
+		    
+	    }//end:for(int i=0;i<firmy.length;i++)	
+	    
+	    
+	    
+	    
+	    
+	    
+//----------------SPRAWDZANIE TELEFON--------------------------------------------------------	    
+	    System.out.println("----------------SPRAWDZANIE TELEFON---------------------");
+	    for(int i=0;i<zlicz;i++)
+	    {
+	    	Pattern pattern = Pattern.compile("(([\\(\\)\\ \\+\\-0-9]{7,})|(\\A\\z))");
+	    	Matcher matcherpattern = pattern.matcher(firmy[i].telefon);
+		    matcherpattern.reset();
+		    boolean found = matcherpattern.find();
+		    if (!found){
+		    	do{
+		    		bledyPrzyWalidacji = bledyPrzyWalidacji + "zły telefon,"+
+		    				firmy[i].nazwa_firmy+","+firmy[i].wojewodztwo+","+
+							firmy[i].miejscowosc+","+firmy[i].ulica+","+
+							firmy[i].kod_pocztowy+","+firmy[i].osoba_kontaktowa+","+
+							firmy[i].telefon+","+firmy[i].tel_kom+","+
+							firmy[i].adres_www+","+firmy[i].nip+","+
+							firmy[i].regon+","+firmy[i].zatrudnienie+",\r\n";
+		    		System.out.println(i+"\t"+firmy[i].telefon);
+		    		firmy[i].telefon="";
+		    		
+		    	}while(matcherpattern.find());
+		    }
+		    
+	    }//end:for(int i=0;i<firmy.length;i++)		
+	    
+	    
+	    
+	    
+	    
+	    
+//----------------SPRAWDZANIE TELEFON KOMÓRKOWEGO--------------------------------------------------------	    
+	    System.out.println("----------------SPRAWDZANIE TELEFON KOMÓRKOWEGO---------------------");
+	    for(int i=0;i<zlicz;i++)
+	    {
+	    	Pattern pattern = Pattern.compile("(([\\(\\)\\ \\+\\-0-9]{9,})|(\\A\\z))");
+	    	Matcher matcherpattern = pattern.matcher(firmy[i].tel_kom);
+		    matcherpattern.reset();
+		    boolean found = matcherpattern.find();
+		    if (!found){
+		    	do{
+		    		bledyPrzyWalidacji = bledyPrzyWalidacji + "zły tel kom,"+
+		    				firmy[i].nazwa_firmy+","+firmy[i].wojewodztwo+","+
+							firmy[i].miejscowosc+","+firmy[i].ulica+","+
+							firmy[i].kod_pocztowy+","+firmy[i].osoba_kontaktowa+","+
+							firmy[i].telefon+","+firmy[i].tel_kom+","+
+							firmy[i].adres_www+","+firmy[i].nip+","+
+							firmy[i].regon+","+firmy[i].zatrudnienie+",\r\n";
+		    		System.out.println(i+"\t"+firmy[i].tel_kom);
+		    		firmy[i].tel_kom="";
+		    		
+		    	}while(matcherpattern.find());
+		    }
+		    
+	    }//end:for(int i=0;i<firmy.length;i++)		
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+	    
+//----------------SPRAWDZANIE NIP--------------------------------------------------------	    
+	    System.out.println("----------------SPRAWDZANIE NIP---------------------");
+	    for(int i=0;i<zlicz;i++)
+	    {
+	    	Pattern pattern = Pattern.compile("(([0-9]{10})|(\\A\\z))");
+	    	Matcher matcherpattern = pattern.matcher(firmy[i].nip);
+		    matcherpattern.reset();
+		    boolean found = matcherpattern.find();
+		    if (!found){
+		    	do{
+		    		bledyPrzyWalidacji = bledyPrzyWalidacji + "zły nip,"+
+		    				firmy[i].nazwa_firmy+","+firmy[i].wojewodztwo+","+
+							firmy[i].miejscowosc+","+firmy[i].ulica+","+
+							firmy[i].kod_pocztowy+","+firmy[i].osoba_kontaktowa+","+
+							firmy[i].telefon+","+firmy[i].tel_kom+","+
+							firmy[i].adres_www+","+firmy[i].nip+","+
+							firmy[i].regon+","+firmy[i].zatrudnienie+",\r\n";
+		    		System.out.println(i+"\t"+firmy[i].nip);
+		    		firmy[i].nip="";
+		    		
+		    	}while(matcherpattern.find());
+		    }
+		    
+	    }//end:for(int i=0;i<firmy.length;i++)	
+	    
+	    
+	    
+
+	    
+	    
+	    
+//----------------SPRAWDZANIE REGON--------------------------------------------------------	    
+	    System.out.println("----------------SPRAWDZANIE REGON---------------------");
+	    for(int i=0;i<zlicz;i++)
+	    {
+	    	Pattern pattern = Pattern.compile("(([0-9]{9})|(\\A\\z))");
+	    	Matcher matcherpattern = pattern.matcher(firmy[i].regon);
+		    matcherpattern.reset();
+		    boolean found = matcherpattern.find();
+		    if (!found){
+		    	do{
+		    		bledyPrzyWalidacji = bledyPrzyWalidacji + "zły regon,"+
+		    				firmy[i].nazwa_firmy+","+firmy[i].wojewodztwo+","+
+							firmy[i].miejscowosc+","+firmy[i].ulica+","+
+							firmy[i].kod_pocztowy+","+firmy[i].osoba_kontaktowa+","+
+							firmy[i].telefon+","+firmy[i].tel_kom+","+
+							firmy[i].adres_www+","+firmy[i].nip+","+
+							firmy[i].regon+","+firmy[i].zatrudnienie+",\r\n";
+		    		System.out.println(i+"\t"+firmy[i].regon);
+		    		firmy[i].regon="";
+		    		
+		    	}while(matcherpattern.find());
+		    }
+		    
+	    }//end:for(int i=0;i<firmy.length;i++)	
+	    
+	    
+	    
+	    
+	    
+	    
+//----------------SPRAWDZANIE ZATRUDNIONYCH--------------------------------------------------------	    
+	    System.out.println("----------------SPRAWDZANIE ZATRUDNIONYCH---------------------");
+	    for(int i=0;i<zlicz;i++)
+	    {
+	    	Pattern pattern = Pattern.compile("(([0-9]{1,}-[0-9]{1,})|(\\A\\z))");
+	    	Matcher matcherpattern = pattern.matcher(firmy[i].zatrudnienie);
+		    matcherpattern.reset();
+		    boolean found = matcherpattern.find();
+		    if (!found){
+		    	do{
+		    		bledyPrzyWalidacji = bledyPrzyWalidacji + "złe zatrudnienie,"+
+		    				firmy[i].nazwa_firmy+","+firmy[i].wojewodztwo+","+
+							firmy[i].miejscowosc+","+firmy[i].ulica+","+
+							firmy[i].kod_pocztowy+","+firmy[i].osoba_kontaktowa+","+
+							firmy[i].telefon+","+firmy[i].tel_kom+","+
+							firmy[i].adres_www+","+firmy[i].nip+","+
+							firmy[i].regon+","+firmy[i].zatrudnienie+",\r\n";
+		    		System.out.println(i+"\t"+firmy[i].zatrudnienie);
+		    		firmy[i].zatrudnienie="";
+		    		
+		    	}while(matcherpattern.find());
+		    }
+		    
+	    }//end:for(int i=0;i<firmy.length;i++)	
+	    
+	    
+	    
+	    
+	    
+	    
 	    
 //--------------ZAPISYWANIE BŁĘDNYCH WIERSZY DO PLIKU------------------------------------------
 	    
