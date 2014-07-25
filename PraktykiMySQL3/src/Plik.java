@@ -19,7 +19,7 @@ public class Plik {
 	static final String DB_URL = "jdbc:mysql://localhost/druga_baza";
 
 	//user and password
-	static final String USER = "user";
+	static final String USER = "password";
 	static final String PASS = "password";
 
 	
@@ -42,8 +42,8 @@ public class Plik {
 		while (csvReader.readRecord())
 		{			
 			firmy[zlicz].nazwa_firmy=csvReader.get("nazwa firmy");				System.out.println(firmy[zlicz].nazwa_firmy);
-	    	firmy[zlicz].wojewodztwo=csvReader.get("województwo");				System.out.println(firmy[zlicz].wojewodztwo);
-	    	firmy[zlicz].miejscowosc=csvReader.get("miejscowość");				System.out.println(firmy[zlicz].miejscowosc);
+	    	firmy[zlicz].wojewodztwo=csvReader.get("wojewodztwo");				System.out.println(firmy[zlicz].wojewodztwo);
+	    	firmy[zlicz].miejscowosc=csvReader.get("miejscowosc");				System.out.println(firmy[zlicz].miejscowosc);
 	    	firmy[zlicz].ulica=csvReader.get("ulica");							System.out.println(firmy[zlicz].ulica);
 	    	firmy[zlicz].kod_pocztowy=csvReader.get("kod pocztowy");			System.out.println(firmy[zlicz].kod_pocztowy);
 	    	firmy[zlicz].osoba_kontaktowa=csvReader.get("osoba kontaktowa");	System.out.println(firmy[zlicz].osoba_kontaktowa);       
@@ -54,7 +54,7 @@ public class Plik {
 	    	firmy[zlicz].regon=csvReader.get("regon");							System.out.println(firmy[zlicz].regon);
 	    	firmy[zlicz].zatrudnienie=csvReader.get("zatrudnienie");			System.out.println(firmy[zlicz].zatrudnienie);
 	    	    	
-			System.out.println("\n"+zlicz+"\n");
+			//System.out.println("\n"+zlicz+"\n");
 			zlicz++;
 		}
 
@@ -70,11 +70,11 @@ public class Plik {
         
         
 //----------------SPRAWDZANIE KODÓW POCZTOWYCH--------------------------------------------------------	    
-	     
+        System.out.println("----------------SPRAWDZANIE KODÓW POCZTOWYCH--------------");
 	    for(int i=0;i<zlicz;i++)
 	    {
 	    	//if(firmy[i].kod_pocztowy.equals(null))break;
-	    	Pattern pattern = Pattern.compile("[0-9]{2}-[0-9]{3}");
+	    	Pattern pattern = Pattern.compile("(([0-9]{2}-[0-9]{3})|(\\A\\z))");
 	    	Matcher matcherpattern = pattern.matcher(firmy[i].kod_pocztowy);
 		    matcherpattern.reset();
 		    boolean found = matcherpattern.find();
@@ -87,9 +87,9 @@ public class Plik {
 							firmy[i].telefon+","+firmy[i].tel_kom+","+
 							firmy[i].adres_www+","+firmy[i].nip+","+
 							firmy[i].regon+","+firmy[i].zatrudnienie+",\r\n";
-		    		
+		    		System.out.println(i+"\t"+firmy[i].kod_pocztowy);
 		    		firmy[i].kod_pocztowy="";
-		    		//System.out.println(i+"\t"+firmy[i].kod_pocztowy);
+		    		
 		    	}while(matcherpattern.find());
 		    }
 		    
@@ -99,10 +99,10 @@ public class Plik {
 	    
 	    
 //----------------SPRAWDZANIE STRON WWW--------------------------------------------------------	    
-
+	    System.out.println("----------------SPRAWDZANIE STRON WWW---------------------");
 	    for(int i=0;i<zlicz;i++)
 	    {
-	    	Pattern pattern = Pattern.compile("(.{1,}\\.[a-z]{2,5})");
+	    	Pattern pattern = Pattern.compile("((.{1,}\\.[a-z]{2,5})|(\\A\\z))");
 	    	Matcher matcherpattern = pattern.matcher(firmy[i].adres_www);
 		    matcherpattern.reset();
 		    boolean found = matcherpattern.find();
@@ -115,8 +115,9 @@ public class Plik {
 							firmy[i].telefon+","+firmy[i].tel_kom+","+
 							firmy[i].adres_www+","+firmy[i].nip+","+
 							firmy[i].regon+","+firmy[i].zatrudnienie+",\r\n";
+		    		System.out.println(i+"\t"+firmy[i].adres_www);
 		    		firmy[i].adres_www="";
-		    		//System.out.println(i+"\t"+firmy[i].adres_www);
+		    		
 		    	}while(matcherpattern.find());
 		    }
 		    
