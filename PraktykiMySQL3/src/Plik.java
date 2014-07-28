@@ -19,10 +19,15 @@ public class Plik {
 	static final String DB_URL = "jdbc:mysql://localhost/druga_baza";
 
 	//user and password
-	static final String USER = "password";
+	static final String USER = "user";
 	static final String PASS = "password";
-
 	
+	public static String polskieZnaki(String slowo)
+    {
+        return slowo.replaceAll("Å", "ł").replaceAll("Ã³", "ó").replaceAll("Å", "ś").replaceAll("Ä", "ą")
+        		.replaceAll("Ä", "ę").replaceAll("Å", "ń");
+    }
+
 	public static void main(String[] args) throws IOException 
 	{
 		
@@ -36,13 +41,13 @@ public class Plik {
 	    int zlicz=0;
         
         CsvReader csvReader = new CsvReader("firmybudownictwo.csv");
-		
+		//new FileReader("firmybudownictwo.csv", "UTF-8")
 		csvReader.readHeaders();
 
 		while (csvReader.readRecord())
 		{			
 			firmy[zlicz].nazwa_firmy=csvReader.get("nazwa firmy");				System.out.println(firmy[zlicz].nazwa_firmy);
-	    	firmy[zlicz].wojewodztwo=csvReader.get("wojewodztwo");				System.out.println(firmy[zlicz].wojewodztwo);
+	    	firmy[zlicz].wojewodztwo=polskieZnaki(csvReader.get("wojewodztwo"));				System.out.println(firmy[zlicz].wojewodztwo);
 	    	firmy[zlicz].miejscowosc=csvReader.get("miejscowosc");				System.out.println(firmy[zlicz].miejscowosc);
 	    	firmy[zlicz].ulica=csvReader.get("ulica");							System.out.println(firmy[zlicz].ulica);
 	    	firmy[zlicz].kod_pocztowy=csvReader.get("kod pocztowy");			System.out.println(firmy[zlicz].kod_pocztowy);
@@ -130,7 +135,7 @@ public class Plik {
 	    System.out.println("----------------SPRAWDZANIE WOJEWODZTWA---------------------");
 	    for(int i=0;i<zlicz;i++)
 	    {
-	    	Pattern pattern = Pattern.compile("(([\\-a-zA-ZąćęłńóśźżĄĘŁŃÓŚŹŻ]{1,})|(\\A\\z))");
+	    	Pattern pattern = Pattern.compile("((dolnośląskie)|(kujawsko-pomorskie)|(lubelskie)|(lubuskie)|(łódzkie)|(małopolskie)|(mazowieckie)|(opolskie)|(podkarpackie)|(podlaskie)|(pomorskie)|(śląskie)|(świętokrzyskie)|(warmińsko-mazurskie)|(wielkopolskie)|(zachodniopomorskie)|(\\A\\z))");
 	    	Matcher matcherpattern = pattern.matcher(firmy[i].wojewodztwo);
 		    matcherpattern.reset();
 		    boolean found = matcherpattern.find();
