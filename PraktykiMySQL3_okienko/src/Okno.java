@@ -2,6 +2,8 @@ import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.Connection;
@@ -11,6 +13,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import au.com.bytecode.opencsv.CSVReader;
 
 import com.csvreader.CsvReader;
 
@@ -24,14 +28,6 @@ public class Okno extends JFrame
 		//user and password
 		static final String USER = "user";
 		static final String PASS = "password";
-		
-		public static String polskieZnaki(String slowo)
-	    {
-	        return slowo.replaceAll("Å", "ł").replaceAll("Ã³", "ó").replaceAll("Å", "ś").replaceAll("Ä", "ą")
-	        		.replaceAll("Ä", "ę").replaceAll("Å", "ń");
-	    }
-	
-		
 		
 		private static final int WIDTH = 400;
 	    private static final int HEIGHT = 300;
@@ -80,404 +76,44 @@ public class Okno extends JFrame
 	        public void actionPerformed(ActionEvent e) 
 	        {
 	            nazwaPliku = textfieldPoleTekstowe.getText();
-	          //--------------WCZYTYWANIE STRINGA Z PLIKU DO TABLICY OBIEKTÓW-------------------------------		
-	    		Firmy[] firmy = new Firmy[562];
-	            for(int i=0;i<firmy.length;i++) firmy[i]=new Firmy();
-	   
-	            String str = ""; 
-	            
-	    	    String str2 = "";
-	    	    String bledyPrzyWalidacji = "";
-	    	    int zlicz=0;
-	            try{
-		            CsvReader csvReader = new CsvReader(nazwaPliku);
-		    		//new FileReader("firmybudownictwo.csv", "UTF-8")
-		    		csvReader.readHeaders();
-		    
-		    		while (csvReader.readRecord())
-		    		{			
-		    			firmy[zlicz].nazwa_firmy=csvReader.get("nazwa firmy");				System.out.println(firmy[zlicz].nazwa_firmy);
-		    	    	firmy[zlicz].wojewodztwo=polskieZnaki(csvReader.get("wojewodztwo"));				System.out.println(firmy[zlicz].wojewodztwo);
-		    	    	firmy[zlicz].miejscowosc=csvReader.get("miejscowosc");				System.out.println(firmy[zlicz].miejscowosc);
-		    	    	firmy[zlicz].ulica=csvReader.get("ulica");							System.out.println(firmy[zlicz].ulica);
-		    	    	firmy[zlicz].kod_pocztowy=csvReader.get("kod pocztowy");			System.out.println(firmy[zlicz].kod_pocztowy);
-		    	    	firmy[zlicz].osoba_kontaktowa=csvReader.get("osoba kontaktowa");	System.out.println(firmy[zlicz].osoba_kontaktowa);       
-		    	    	firmy[zlicz].telefon=csvReader.get("telefon");						System.out.println(firmy[zlicz].telefon);
-		    	    	firmy[zlicz].tel_kom=csvReader.get("tel. kom.");					System.out.println(firmy[zlicz].tel_kom);
-		    	    	firmy[zlicz].adres_www=csvReader.get("adres www");					System.out.println(firmy[zlicz].adres_www);
-		    	    	firmy[zlicz].nip=csvReader.get("nip");								System.out.println(firmy[zlicz].nip);
-		    	    	firmy[zlicz].regon=csvReader.get("regon");							System.out.println(firmy[zlicz].regon);
-		    	    	firmy[zlicz].zatrudnienie=csvReader.get("zatrudnienie");			System.out.println(firmy[zlicz].zatrudnienie);
-		    	    	    	
-		    			//System.out.println("\n"+zlicz+"\n");
-		    			zlicz++;
-		    		}
-		    
-	    			csvReader.close();
-	            }catch(IOException e2) {
-					// TODO Auto-generated catch block
-					e2.printStackTrace();
-				}
-	    		
-	    		
-	            bledyPrzyWalidacji = "powód błędu,nazwa_firmy,wojewodztwo,"+
-	    							"miejscowosc,ulica,"+
-	    							"kod_pocztowy,osoba_kontaktowa,"+
-	    							"telefon,tel_kom,"+
-	    							"adres_www,nip,"+
-	    							"regon,zatrudnienie,\r\n";
-	            
-	            
-	    //----------------SPRAWDZANIE KODÓW POCZTOWYCH--------------------------------------------------------	    
-	            System.out.println("----------------SPRAWDZANIE KODÓW POCZTOWYCH--------------");
-	    	    for(int i=0;i<zlicz;i++)
-	    	    {
-	    	    	//if(firmy[i].kod_pocztowy.equals(null))break;
-	    	    	Pattern pattern = Pattern.compile("(([0-9]{2}-[0-9]{3})|(\\A\\z))");
-	    	    	Matcher matcherpattern = pattern.matcher(firmy[i].kod_pocztowy);
-	    		    matcherpattern.reset();
-	    		    boolean found = matcherpattern.find();
-	    		    if (!found){
-	    		    	do{
-	    		    		bledyPrzyWalidacji = bledyPrzyWalidacji + "zły kod pocztowy,"+
-	    		    				firmy[i].nazwa_firmy+","+firmy[i].wojewodztwo+","+
-	    							firmy[i].miejscowosc+","+firmy[i].ulica+","+
-	    							firmy[i].kod_pocztowy+","+firmy[i].osoba_kontaktowa+","+
-	    							firmy[i].telefon+","+firmy[i].tel_kom+","+
-	    							firmy[i].adres_www+","+firmy[i].nip+","+
-	    							firmy[i].regon+","+firmy[i].zatrudnienie+",\r\n";
-	    		    		System.out.println(i+"\t"+firmy[i].kod_pocztowy);
-	    		    		firmy[i].kod_pocztowy="";
-	    		    		
-	    		    	}while(matcherpattern.find());
-	    		    }
-	    		    
-	    	    }//end:for(int i=0;i<firmy.length;i++)
-	    	 
-	    	    
-	    	    
-	    	    
-	    //----------------SPRAWDZANIE STRON WWW--------------------------------------------------------	    
-	    	    System.out.println("----------------SPRAWDZANIE STRON WWW---------------------");
-	    	    for(int i=0;i<zlicz;i++)
-	    	    {
-	    	    	Pattern pattern = Pattern.compile("((.{1,}\\.[a-z]{2,5})|(\\A\\z))");
-	    	    	Matcher matcherpattern = pattern.matcher(firmy[i].adres_www);
-	    		    matcherpattern.reset();
-	    		    boolean found = matcherpattern.find();
-	    		    if (!found){
-	    		    	do{
-	    		    		bledyPrzyWalidacji = bledyPrzyWalidacji + "zły adres www,"+
-	    		    				firmy[i].nazwa_firmy+","+firmy[i].wojewodztwo+","+
-	    							firmy[i].miejscowosc+","+firmy[i].ulica+","+
-	    							firmy[i].kod_pocztowy+","+firmy[i].osoba_kontaktowa+","+
-	    							firmy[i].telefon+","+firmy[i].tel_kom+","+
-	    							firmy[i].adres_www+","+firmy[i].nip+","+
-	    							firmy[i].regon+","+firmy[i].zatrudnienie+",\r\n";
-	    		    		System.out.println(i+"\t"+firmy[i].adres_www);
-	    		    		firmy[i].adres_www="";
-	    		    		
-	    		    	}while(matcherpattern.find());
-	    		    }
-	    		    
-	    	    }//end:for(int i=0;i<firmy.length;i++)	    
-	    
-	    	    
-	    	    
-	    	    
-//----------------SPRAWDZANIE WOJEWODZTWA--------------------------------------------------------	    
-	    	    System.out.println("----------------SPRAWDZANIE WOJEWODZTWA---------------------");
-	    	    for(int i=0;i<zlicz;i++)
-	    	    {
-	    	    	Pattern pattern = Pattern.compile("((dolnośląskie)|(kujawsko-pomorskie)|(lubelskie)|(lubuskie)|(łódzkie)|(małopolskie)|(mazowieckie)|(opolskie)|(podkarpackie)|(podlaskie)|(pomorskie)|(śląskie)|(świętokrzyskie)|(warmińsko-mazurskie)|(wielkopolskie)|(zachodniopomorskie)|(\\A\\z))");
-	    	    	Matcher matcherpattern = pattern.matcher(firmy[i].wojewodztwo);
-	    		    matcherpattern.reset();
-	    		    boolean found = matcherpattern.find();
-	    		    if (!found){
-	    		    	do{
-	    		    		bledyPrzyWalidacji = bledyPrzyWalidacji + "złe województwo,"+
-	    		    				firmy[i].nazwa_firmy+","+firmy[i].wojewodztwo+","+
-	    							firmy[i].miejscowosc+","+firmy[i].ulica+","+
-	    							firmy[i].kod_pocztowy+","+firmy[i].osoba_kontaktowa+","+
-	    							firmy[i].telefon+","+firmy[i].tel_kom+","+
-	    							firmy[i].adres_www+","+firmy[i].nip+","+
-	    							firmy[i].regon+","+firmy[i].zatrudnienie+",\r\n";
-	    		    		System.out.println(i+"\t"+firmy[i].wojewodztwo);
-	    		    		firmy[i].wojewodztwo="";
-	    		    		
-	    		    	}while(matcherpattern.find());
-	    		    }
-	    		    
-	    	    }//end:for(int i=0;i<firmy.length;i++)		    
-	    	    
-	    	    
-	    	    
-	    	    
-	    	    
-	    //----------------SPRAWDZANIE MIASTA--------------------------------------------------------	    
-	    	    System.out.println("----------------SPRAWDZANIE MIASTA---------------------");
-	    	    for(int i=0;i<zlicz;i++)
-	    	    {
-	    	    	Pattern pattern = Pattern.compile("(([\\-a-zA-ZąćęłńóśźżĄĘŁŃÓŚŹŻ]{1,})|(\\A\\z))");
-	    	    	Matcher matcherpattern = pattern.matcher(firmy[i].miejscowosc);
-	    		    matcherpattern.reset();
-	    		    boolean found = matcherpattern.find();
-	    		    if (!found){
-	    		    	do{
-	    		    		bledyPrzyWalidacji = bledyPrzyWalidacji + "złe miasto,"+
-	    		    				firmy[i].nazwa_firmy+","+firmy[i].wojewodztwo+","+
-	    							firmy[i].miejscowosc+","+firmy[i].ulica+","+
-	    							firmy[i].kod_pocztowy+","+firmy[i].osoba_kontaktowa+","+
-	    							firmy[i].telefon+","+firmy[i].tel_kom+","+
-	    							firmy[i].adres_www+","+firmy[i].nip+","+
-	    							firmy[i].regon+","+firmy[i].zatrudnienie+",\r\n";
-	    		    		System.out.println(i+"\t"+firmy[i].miejscowosc);
-	    		    		firmy[i].miejscowosc="";
-	    		    		
-	    		    	}while(matcherpattern.find());
-	    		    }
-	    		    
-	    	    }//end:for(int i=0;i<firmy.length;i++)		    
-	    	    
-	    
-	    	    
-	    	    
-	    	    
-	    	    
-	    	    
-	    //----------------SPRAWDZANIE ULICY--------------------------------------------------------	    
-	    	    System.out.println("----------------SPRAWDZANIE ULICY---------------------");
-	    	    for(int i=0;i<zlicz;i++)
-	    	    {
-	    	    	Pattern pattern = Pattern.compile("((([\\ \\.\\'\\-a-zA-ZąćęłńóśźżĄĘŁŃÓŚŹŻ]{1,}))|(\\A\\z))");
-	    	    	Matcher matcherpattern = pattern.matcher(firmy[i].ulica);
-	    		    matcherpattern.reset();
-	    		    boolean found = matcherpattern.find();
-	    		    if (!found){
-	    		    	do{
-	    		    		bledyPrzyWalidacji = bledyPrzyWalidacji + "zła ulica,"+
-	    		    				firmy[i].nazwa_firmy+","+firmy[i].wojewodztwo+","+
-	    							firmy[i].miejscowosc+","+firmy[i].ulica+","+
-	    							firmy[i].kod_pocztowy+","+firmy[i].osoba_kontaktowa+","+
-	    							firmy[i].telefon+","+firmy[i].tel_kom+","+
-	    							firmy[i].adres_www+","+firmy[i].nip+","+
-	    							firmy[i].regon+","+firmy[i].zatrudnienie+",\r\n";
-	    		    		System.out.println(i+"\t"+firmy[i].ulica);
-	    		    		firmy[i].ulica="";
-	    		    		
-	    		    	}while(matcherpattern.find());
-	    		    }
-	    		    
-	    	    }//end:for(int i=0;i<firmy.length;i++)	
-	    	    
-	    	    
-	    	    
-	    	    
-	    	    
-	    	    
-	    //----------------SPRAWDZANIE OSOBY KONTAKTOWEJ--------------------------------------------------------	    
-	    	    System.out.println("----------------SPRAWDZANIE OSOBY KONTAKTOWEJ---------------------");
-	    	    for(int i=0;i<zlicz;i++)
-	    	    {
-	    	    	Pattern pattern = Pattern.compile("((([\\ \\.\\\\-a-zA-ZąćęłńóśźżĄĘŁŃÓŚŹŻ]{1,}))|(\\A\\z))");
-	    	    	Matcher matcherpattern = pattern.matcher(firmy[i].osoba_kontaktowa);
-	    		    matcherpattern.reset();
-	    		    boolean found = matcherpattern.find();
-	    		    if (!found){
-	    		    	do{
-	    		    		bledyPrzyWalidacji = bledyPrzyWalidacji + "zła osoba kontaktowa,"+
-	    		    				firmy[i].nazwa_firmy+","+firmy[i].wojewodztwo+","+
-	    							firmy[i].miejscowosc+","+firmy[i].ulica+","+
-	    							firmy[i].kod_pocztowy+","+firmy[i].osoba_kontaktowa+","+
-	    							firmy[i].telefon+","+firmy[i].tel_kom+","+
-	    							firmy[i].adres_www+","+firmy[i].nip+","+
-	    							firmy[i].regon+","+firmy[i].zatrudnienie+",\r\n";
-	    		    		System.out.println(i+"\t"+firmy[i].osoba_kontaktowa);
-	    		    		firmy[i].osoba_kontaktowa="";
-	    		    		
-	    		    	}while(matcherpattern.find());
-	    		    }
-	    		    
-	    	    }//end:for(int i=0;i<firmy.length;i++)	
-	    	    
-	    	    
-	    	    
-	    	    
-	    	    
-	    	    
-	    //----------------SPRAWDZANIE TELEFON--------------------------------------------------------	    
-	    	    System.out.println("----------------SPRAWDZANIE TELEFON---------------------");
-	    	    for(int i=0;i<zlicz;i++)
-	    	    {
-	    	    	Pattern pattern = Pattern.compile("(([\\(\\)\\ \\+\\-0-9]{7,})|(\\A\\z))");
-	    	    	Matcher matcherpattern = pattern.matcher(firmy[i].telefon);
-	    		    matcherpattern.reset();
-	    		    boolean found = matcherpattern.find();
-	    		    if (!found){
-	    		    	do{
-	    		    		bledyPrzyWalidacji = bledyPrzyWalidacji + "zły telefon,"+
-	    		    				firmy[i].nazwa_firmy+","+firmy[i].wojewodztwo+","+
-	    							firmy[i].miejscowosc+","+firmy[i].ulica+","+
-	    							firmy[i].kod_pocztowy+","+firmy[i].osoba_kontaktowa+","+
-	    							firmy[i].telefon+","+firmy[i].tel_kom+","+
-	    							firmy[i].adres_www+","+firmy[i].nip+","+
-	    							firmy[i].regon+","+firmy[i].zatrudnienie+",\r\n";
-	    		    		System.out.println(i+"\t"+firmy[i].telefon);
-	    		    		firmy[i].telefon="";
-	    		    		
-	    		    	}while(matcherpattern.find());
-	    		    }
-	    		    
-	    	    }//end:for(int i=0;i<firmy.length;i++)		
-	    	    
-	    	    
-	    	    
-	    	    
-	    	    
-	    	    
-	    //----------------SPRAWDZANIE TELEFON KOMÓRKOWEGO--------------------------------------------------------	    
-	    	    System.out.println("----------------SPRAWDZANIE TELEFON KOMÓRKOWEGO---------------------");
-	    	    for(int i=0;i<zlicz;i++)
-	    	    {
-	    	    	Pattern pattern = Pattern.compile("(([\\(\\)\\ \\+\\-0-9]{9,})|(\\A\\z))");
-	    	    	Matcher matcherpattern = pattern.matcher(firmy[i].tel_kom);
-	    		    matcherpattern.reset();
-	    		    boolean found = matcherpattern.find();
-	    		    if (!found){
-	    		    	do{
-	    		    		bledyPrzyWalidacji = bledyPrzyWalidacji + "zły tel kom,"+
-	    		    				firmy[i].nazwa_firmy+","+firmy[i].wojewodztwo+","+
-	    							firmy[i].miejscowosc+","+firmy[i].ulica+","+
-	    							firmy[i].kod_pocztowy+","+firmy[i].osoba_kontaktowa+","+
-	    							firmy[i].telefon+","+firmy[i].tel_kom+","+
-	    							firmy[i].adres_www+","+firmy[i].nip+","+
-	    							firmy[i].regon+","+firmy[i].zatrudnienie+",\r\n";
-	    		    		System.out.println(i+"\t"+firmy[i].tel_kom);
-	    		    		firmy[i].tel_kom="";
-	    		    		
-	    		    	}while(matcherpattern.find());
-	    		    }
-	    		    
-	    	    }//end:for(int i=0;i<firmy.length;i++)		
-	    	    
-	    	    
-	    	    
-	    	    
-	    	    
-	    	    
-	    	    
-	    	    
-	    //----------------SPRAWDZANIE NIP--------------------------------------------------------	    
-	    	    System.out.println("----------------SPRAWDZANIE NIP---------------------");
-	    	    for(int i=0;i<zlicz;i++)
-	    	    {
-	    	    	Pattern pattern = Pattern.compile("(([0-9]{10})|(\\A\\z))");
-	    	    	Matcher matcherpattern = pattern.matcher(firmy[i].nip);
-	    		    matcherpattern.reset();
-	    		    boolean found = matcherpattern.find();
-	    		    if (!found){
-	    		    	do{
-	    		    		bledyPrzyWalidacji = bledyPrzyWalidacji + "zły nip,"+
-	    		    				firmy[i].nazwa_firmy+","+firmy[i].wojewodztwo+","+
-	    							firmy[i].miejscowosc+","+firmy[i].ulica+","+
-	    							firmy[i].kod_pocztowy+","+firmy[i].osoba_kontaktowa+","+
-	    							firmy[i].telefon+","+firmy[i].tel_kom+","+
-	    							firmy[i].adres_www+","+firmy[i].nip+","+
-	    							firmy[i].regon+","+firmy[i].zatrudnienie+",\r\n";
-	    		    		System.out.println(i+"\t"+firmy[i].nip);
-	    		    		firmy[i].nip="";
-	    		    		
-	    		    	}while(matcherpattern.find());
-	    		    }
-	    		    
-	    	    }//end:for(int i=0;i<firmy.length;i++)	
-	    	    
-	    	    
-	    	    
-	    
-	    	    
-	    	    
-	    	    
-	    //----------------SPRAWDZANIE REGON--------------------------------------------------------	    
-	    	    System.out.println("----------------SPRAWDZANIE REGON---------------------");
-	    	    for(int i=0;i<zlicz;i++)
-	    	    {
-	    	    	Pattern pattern = Pattern.compile("(([0-9]{9})|(\\A\\z))");
-	    	    	Matcher matcherpattern = pattern.matcher(firmy[i].regon);
-	    		    matcherpattern.reset();
-	    		    boolean found = matcherpattern.find();
-	    		    if (!found){
-	    		    	do{
-	    		    		bledyPrzyWalidacji = bledyPrzyWalidacji + "zły regon,"+
-	    		    				firmy[i].nazwa_firmy+","+firmy[i].wojewodztwo+","+
-	    							firmy[i].miejscowosc+","+firmy[i].ulica+","+
-	    							firmy[i].kod_pocztowy+","+firmy[i].osoba_kontaktowa+","+
-	    							firmy[i].telefon+","+firmy[i].tel_kom+","+
-	    							firmy[i].adres_www+","+firmy[i].nip+","+
-	    							firmy[i].regon+","+firmy[i].zatrudnienie+",\r\n";
-	    		    		System.out.println(i+"\t"+firmy[i].regon);
-	    		    		firmy[i].regon="";
-	    		    		
-	    		    	}while(matcherpattern.find());
-	    		    }
-	    		    
-	    	    }//end:for(int i=0;i<firmy.length;i++)	
-	    	    
-	    	    
-	    	    
-	    	    
-	    	    
-	    	    
-	    //----------------SPRAWDZANIE ZATRUDNIONYCH--------------------------------------------------------	    
-	    	    System.out.println("----------------SPRAWDZANIE ZATRUDNIONYCH---------------------");
-	    	    for(int i=0;i<zlicz;i++)
-	    	    {
-	    	    	Pattern pattern = Pattern.compile("(([0-9]{1,}-[0-9]{1,})|(\\A\\z))");
-	    	    	Matcher matcherpattern = pattern.matcher(firmy[i].zatrudnienie);
-	    		    matcherpattern.reset();
-	    		    boolean found = matcherpattern.find();
-	    		    if (!found){
-	    		    	do{
-	    		    		bledyPrzyWalidacji = bledyPrzyWalidacji + "złe zatrudnienie,"+
-	    		    				firmy[i].nazwa_firmy+","+firmy[i].wojewodztwo+","+
-	    							firmy[i].miejscowosc+","+firmy[i].ulica+","+
-	    							firmy[i].kod_pocztowy+","+firmy[i].osoba_kontaktowa+","+
-	    							firmy[i].telefon+","+firmy[i].tel_kom+","+
-	    							firmy[i].adres_www+","+firmy[i].nip+","+
-	    							firmy[i].regon+","+firmy[i].zatrudnienie+",\r\n";
-	    		    		System.out.println(i+"\t"+firmy[i].zatrudnienie);
-	    		    		firmy[i].zatrudnienie="";
-	    		    		
-	    		    	}while(matcherpattern.find());
-	    		    }
-	    		    
-	    	    }//end:for(int i=0;i<firmy.length;i++)	
-	    	    
-	    	    
-	    	    
-	    	    
-	    	    
-	    	    
-	    	    
-	    //--------------ZAPISYWANIE BŁĘDNYCH WIERSZY DO PLIKU------------------------------------------
-	    	    
-	    	   
+	            String str="";String str2="";
+	            String[] rekord = new String[100000];
+	            for(int i=0;i<rekord.length;i++) rekord[i]=new String();
+	            int iloscKolumn=0,iloscWhile=0,iloscRekordow=0;
+	            CSVReader reader;
 				try {
-					FileWriter f;
-					f = new FileWriter("niewczytane.csv");
-					f.write((bledyPrzyWalidacji));
-		    		f.close(); 
-				} catch (IOException e1) {
+					reader = new CSVReader(new FileReader(nazwaPliku));
+				
+		    	    String[] row;
+		    	   
+		    	    try {
+						while ((row = reader.readNext()) != null) 
+						{
+							for (int i = 0; i < row.length; i++) 
+						    {
+								if(iloscWhile==0) iloscKolumn++;
+								rekord[iloscRekordow]=row[i];
+								//System.out.print(iloscRekordow+" "+rekord[iloscRekordow]+"; ");
+								
+								iloscRekordow++;
+						    }
+							iloscWhile++;
+							System.out.println();
+						    //break;
+						}
+						//System.out.print(iloscKolumn);
+						//firmybudownictwo.csv
+						
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				} catch (FileNotFoundException e3) {
 					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					e3.printStackTrace();
 				}
-	    		
-	    	    
-	    	    
-	    		//System.out.println(bledyPrzyWalidacji);
-	    	    
-	    	    
-	    
+	            
+
 	    //---------------WRZUCANIE DANYCH DO BAZY DANYCH----------------------------------------------	
 	    	    
 	    		Connection conn = null;
@@ -495,73 +131,100 @@ public class Okno extends JFrame
 	    			stmt = conn.createStatement();
 	    			String sql="";
 	    			
-	    			//begin insert
-	    			sql = "INSERT INTO firmy (nazwa_firmy, wojewodztwo, miejscowosc, ulica, kod_pocztowy, osoba_kontaktowa, telefon, tel_kom, adres_www, nip, regon, zatrudnienie) VALUES ";               
+	    			String nazwaTabeli= nazwaPliku.substring(0, nazwaPliku.length()-4);
+// niedziała	drop    			
+//	    			sql="DROP TABLE "+nazwaPliku;
+//	    			stmt.executeUpdate(sql);
+//	    			System.out.println("Table  deleted in given database...");
 	    			
-	    			for(int i=1;i<zlicz;i++)
+
+	    			
+//	    			sql = "CREATE TABLE "+nazwaTabeli+" (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, ";
+//	    	        for(int i=0;i<iloscKolumn;i++){
+//	    	        	rekord[i]=rekord[i].replaceAll(" ", "_");
+//	    	        	if(i<iloscKolumn-1)sql=sql+rekord[i]+" VARCHAR(300), ";
+//	    	        	if(i==iloscKolumn-1)sql=sql+rekord[i]+" VARCHAR(300));";
+//	    	        }
+//	    	        System.out.println(sql);
+//	    			stmt.executeUpdate(sql);
+	    			
+	    			//begin insert
+	    			sql = "INSERT INTO "+nazwaTabeli+" (";
+	    			//firmy (nazwa_firmy, wojewodztwo, miejscowosc, ulica, kod_pocztowy, osoba_kontaktowa, telefon, tel_kom, adres_www, nip, regon, zatrudnienie) VALUES ";               
+	    			
+	    			 for(int i=0;i<iloscKolumn;i++){
+		    	        	rekord[i]=rekord[i].replaceAll(" ", "_");
+		    	        	if(i<iloscKolumn-1)sql=sql+rekord[i]+", ";
+		    	        	if(i==iloscKolumn-1)sql=sql+rekord[i]+") VALUES ('";
+		    	     }
+	    			System.out.println(sql);
+
+	    			for(int i=iloscKolumn;i<iloscRekordow;i++)
 	    			{
-	    				str="('"+firmy[i].nazwa_firmy+"','"+firmy[i].wojewodztwo+"',"+
-	    						"'"+firmy[i].miejscowosc+"','"+firmy[i].ulica+"',"+
-	    						"'"+firmy[i].kod_pocztowy+"','"+firmy[i].osoba_kontaktowa+"',"+
-	    						"'"+firmy[i].telefon+"','"+firmy[i].tel_kom+"',"+
-	    						"'"+firmy[i].adres_www+"','"+firmy[i].nip+"',"+
-	    						"'"+firmy[i].regon+"','"+firmy[i].zatrudnienie+"');";
-	    				str2=sql+str;
-	    				stmt.executeUpdate(str2);
-	    				System.out.println("insert:\t"+i);	
+	    				if((i%iloscKolumn!=0)){//&(i==iloscKolumn)){
+	    					str=str+rekord[i]+"','";System.out.println("cos");
+	    				}
+	    				else if((i%iloscKolumn==0)){
+		    	        	str=str+rekord[i]+"');";
+		    	        	str2=sql+str;
+		    	        	//stmt.executeUpdate(str2);
+		    	        	System.out.println(i+"\t"+str2);
+		    	        	str2="";str="";
+		    	        }
+	    				
 	    			}
 	    			
 	    			//end insert
 	    			
 	    			
-	    			//begin select
-	    			sql = "SELECT * FROM firmy";
-	    			ResultSet rs = stmt.executeQuery(sql);
-	    
-	    			
-	    			//Extract data from result set
-	    			while(rs.next())
-	    			{
-	    				//Retrieve by column name
-	    				int id  = rs.getInt("id");
-	    				String nazwa_firmy = rs.getString("nazwa_firmy");
-	    				String wojewodztwo = rs.getString("wojewodztwo");
-	    				String miejscowosc = rs.getString("miejscowosc");
-	    				String ulica = rs.getString("ulica");
-	    				String kod_pocztowy = rs.getString("kod_pocztowy");
-	    				String osoba_kontaktowa = rs.getString("osoba_kontaktowa");
-	    				String telefon = rs.getString("telefon");
-	    				String tel_kom = rs.getString("tel_kom");
-	    				String adres_www = rs.getString("adres_www");
-	    				String nip = rs.getString("nip");
-	    				String regon = rs.getString("regon");
-	    				String zatrudnienie = rs.getString("zatrudnienie");
-	    
-	    				//Display values
-	    				
-	    				
-	    				System.out.print(id);
-	    				System.out.print("\t" + nazwa_firmy);
-	    				System.out.print("\t" + wojewodztwo);
-	    				System.out.print("\t" + miejscowosc);
-	    				System.out.print("\t" + ulica);
-	    				System.out.print("\t" + kod_pocztowy);
-	    				System.out.print("\t" + osoba_kontaktowa);
-	    				System.out.print("\t" + telefon);
-	    				System.out.print("\t" + tel_kom);
-	    				System.out.print("\t" + adres_www);
-	    				System.out.print("\t" + nip);
-	    				System.out.print("\t" + regon);
-	    				System.out.println("\t" + zatrudnienie);
-	    
-	    			
-	    			
-	    			
-	    			}//end while 
-	    			//end select
-	    			
-	    			//Clean-up environment
-	    			rs.close();
+//	    			//begin select
+//	    			sql = "SELECT * FROM firmy";
+//	    			ResultSet rs = stmt.executeQuery(sql);
+//	    
+//	    			
+//	    			//Extract data from result set
+//	    			while(rs.next())
+//	    			{
+//	    				//Retrieve by column name
+//	    				int id  = rs.getInt("id");
+//	    				String nazwa_firmy = rs.getString("nazwa_firmy");
+//	    				String wojewodztwo = rs.getString("wojewodztwo");
+//	    				String miejscowosc = rs.getString("miejscowosc");
+//	    				String ulica = rs.getString("ulica");
+//	    				String kod_pocztowy = rs.getString("kod_pocztowy");
+//	    				String osoba_kontaktowa = rs.getString("osoba_kontaktowa");
+//	    				String telefon = rs.getString("telefon");
+//	    				String tel_kom = rs.getString("tel_kom");
+//	    				String adres_www = rs.getString("adres_www");
+//	    				String nip = rs.getString("nip");
+//	    				String regon = rs.getString("regon");
+//	    				String zatrudnienie = rs.getString("zatrudnienie");
+//	    
+//	    				//Display values
+//	    				
+//	    				
+//	    				System.out.print(id);
+//	    				System.out.print("\t" + nazwa_firmy);
+//	    				System.out.print("\t" + wojewodztwo);
+//	    				System.out.print("\t" + miejscowosc);
+//	    				System.out.print("\t" + ulica);
+//	    				System.out.print("\t" + kod_pocztowy);
+//	    				System.out.print("\t" + osoba_kontaktowa);
+//	    				System.out.print("\t" + telefon);
+//	    				System.out.print("\t" + tel_kom);
+//	    				System.out.print("\t" + adres_www);
+//	    				System.out.print("\t" + nip);
+//	    				System.out.print("\t" + regon);
+//	    				System.out.println("\t" + zatrudnienie);
+//	    
+//	    			
+//	    			
+//	    			
+//	    			}//end while 
+//	    			//end select
+//	    			
+//	    			//Clean-up environment
+//	    			rs.close();
 	    			stmt.close();
 	    			conn.close();
 	    		}
