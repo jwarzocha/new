@@ -30,8 +30,8 @@ public class Okno extends JFrame
 		static final String DB_URL = "jdbc:mysql://localhost/druga_baza";
 
 		//user and password
-		static final String USER = "user";
-		static final String PASS = "password";
+		static final String USER = "mysql";
+		static final String PASS = "mysql";
 		
 		private static final int WIDTH = 1200;
 	    private static final int HEIGHT = 400;
@@ -39,7 +39,7 @@ public class Okno extends JFrame
 	    private JLabel labelTekst, labelNazwa, labelCSV, labelSQL;
 	    private JTextField textfieldPoleTekstowe, textfieldNazwaPliku;
 	    private JTextField textfieldCSV, textfieldSQL;
-	    private JButton importuj, wyjdz, wybierz, pokazCSV, pokazSQL;
+	    private JButton importuj, wyjdz, wybierz, pokazCSV, pokazSQL, przyporzadkuj;
 	     
 	    //Button handlers:
 	    private ImportujButtonHandler cbHandler;
@@ -47,6 +47,7 @@ public class Okno extends JFrame
 	    private wybierzButtonHandler chHandler;
 	    private csvButtonHandler csvHandler;
 	    private sqlButtonHandler sqlHandler;
+	    private przyButtonHandler przyHandler;
 	    
 	    public String nazwaPliku;
 	    public String sciezkaPliku;
@@ -85,7 +86,11 @@ public class Okno extends JFrame
 	        pokazSQL = new JButton("Pokaż kolumny sql");
 	        sqlHandler = new sqlButtonHandler();
 	        pokazSQL.addActionListener(sqlHandler);
-	         
+
+	        przyporzadkuj = new JButton("Przyporządkuj kolumny");
+	        przyHandler = new przyButtonHandler();
+	        przyporzadkuj.addActionListener(przyHandler);
+	        
 	        setTitle("Okienko");
 	        Container pane = getContentPane();
 	        pane.setLayout(new GridLayout(7, 2));
@@ -108,13 +113,15 @@ public class Okno extends JFrame
 	        pane.add(wybierz);
 	        pane.add(pokazCSV);
 	        pane.add(pokazSQL);
+	        pane.add(przyporzadkuj);
 	        
 	        setSize(WIDTH, HEIGHT);
 	        setVisible(true);
 	        setDefaultCloseOperation(EXIT_ON_CLOSE);
 	    }
-	     
 	    
+	    
+
 	    //importuj button
 	    private class ImportujButtonHandler implements ActionListener
 	    {
@@ -322,6 +329,13 @@ public class Okno extends JFrame
 	        }
 	    }
 	    
+	    
+	  //przyporzadkuj button
+	    public class przyButtonHandler implements ActionListener{
+	        public void actionPerformed(ActionEvent e){
+	        	Okno2 rectsObj = new Okno2();
+	        }
+	    }
 	    //main
 	    public static void main(String[] args){
 	        Okno rectObj = new Okno();
