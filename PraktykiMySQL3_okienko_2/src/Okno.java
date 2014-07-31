@@ -33,17 +33,20 @@ public class Okno extends JFrame
 		static final String USER = "user";
 		static final String PASS = "password";
 		
-		private static final int WIDTH = 600;
-	    private static final int HEIGHT = 300;
+		private static final int WIDTH = 1200;
+	    private static final int HEIGHT = 400;
 	     
-	    private JLabel labelTekst,labelNazwa;
-	    private JTextField textfieldPoleTekstowe,textfieldNazwaPliku;
-	    private JButton importuj, wyjdz, wybierz;
+	    private JLabel labelTekst, labelNazwa, labelCSV, labelSQL;
+	    private JTextField textfieldPoleTekstowe, textfieldNazwaPliku;
+	    private JTextField textfieldCSV, textfieldSQL;
+	    private JButton importuj, wyjdz, wybierz, pokazCSV, pokazSQL;
 	     
 	    //Button handlers:
 	    private ImportujButtonHandler cbHandler;
 	    private wyjdzButtonHandler ebHandler;
 	    private wybierzButtonHandler chHandler;
+	    private csvButtonHandler csvHandler;
+	    private sqlButtonHandler sqlHandler;
 	    
 	    public String nazwaPliku;
 	    public String sciezkaPliku;
@@ -55,6 +58,12 @@ public class Okno extends JFrame
 	        
 	        labelNazwa = new JLabel("Wpisz nazwe tabeli: ", SwingConstants.RIGHT);
 	        textfieldNazwaPliku = new JTextField(10);
+	        
+	        labelCSV = new JLabel("CSV: ", SwingConstants.RIGHT);
+	        textfieldCSV = new JTextField(10);
+	        
+	        labelSQL = new JLabel("SQL: ", SwingConstants.RIGHT);
+	        textfieldSQL = new JTextField(10);
 	      	         
 	        //SPecify handlers for each button and add (register) ActionListeners to each button.
 	        importuj = new JButton("Importuj Dane");
@@ -68,10 +77,18 @@ public class Okno extends JFrame
 	        wybierz = new JButton("Wybierz Plik");
 	        chHandler = new wybierzButtonHandler();
 	        wybierz.addActionListener(chHandler);
+	        
+	        pokazCSV = new JButton("Pokaż kolumny csv");
+	        csvHandler = new csvButtonHandler();
+	        pokazCSV.addActionListener(csvHandler);
+	        
+	        pokazSQL = new JButton("Pokaż kolumny sql");
+	        sqlHandler = new sqlButtonHandler();
+	        pokazSQL.addActionListener(sqlHandler);
 	         
 	        setTitle("Okienko");
 	        Container pane = getContentPane();
-	        pane.setLayout(new GridLayout(4, 2));
+	        pane.setLayout(new GridLayout(7, 2));
 	         
 	        //Add things to the pane in the order you want them to appear (left to right, top to bottom)
 	        pane.add(labelTekst);
@@ -79,11 +96,19 @@ public class Okno extends JFrame
 	        
 	        pane.add(labelNazwa);
 	        pane.add(textfieldNazwaPliku);
+	        
+	        pane.add(labelCSV);
+	        pane.add(textfieldCSV);
+	        
+	        pane.add(labelSQL);
+	        pane.add(textfieldSQL);
 
 	        pane.add(importuj);
 	        pane.add(wyjdz);
 	        pane.add(wybierz);
-	         
+	        pane.add(pokazCSV);
+	        pane.add(pokazSQL);
+	        
 	        setSize(WIDTH, HEIGHT);
 	        setVisible(true);
 	        setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -145,10 +170,7 @@ public class Okno extends JFrame
 	    			System.out.println("Creating statement:");
 	    			stmt = conn.createStatement();
 	    			String sql="";
-	    			
-	    			//nazwa pliku
-	    			//String nazwaTabeli= nazwaPliku.substring(0, nazwaPliku.length()-4);
-
+	    	
 	    			
 	    			//begin create table
 	    			try{
@@ -161,7 +183,8 @@ public class Okno extends JFrame
 		    	        }
 		    	        System.out.println(sql);
 		    			stmt.executeUpdate(sql);
-	    			}catch(SQLException e4) {e4.printStackTrace();}
+		    			textfieldSQL.setText("Tabela "+nazwaPliku+" została utworzona.");
+	    			}catch(SQLException e4) {textfieldSQL.setText("Taka "+nazwaPliku+" tabela już istnieje w bazie!!!");}
 	    			//end create table
 	    			
 	    			//begin insert
@@ -191,12 +214,11 @@ public class Okno extends JFrame
 	    				i=i+j;
 	    			}
 	    			//end insert	
-
-	    			//Clean-up environment
+	    			textfieldSQL.setText("Wstawianie do "+nazwaPliku+" zakończone pomyślnie.");
 	    			stmt.close();
 	    			conn.close();
 	    		}
-	    		catch(SQLException se){	se.printStackTrace();}//Handle errors for JDBC
+	    		catch(SQLException se){textfieldSQL.setText("Sprawdź połączenie z bazą danych.");}//Handle errors for JDBC
 	    		catch(Exception ex){  ex.printStackTrace();}//Handle errors for Class.forName
 	    		finally
 	    		{//finally block used to close resources
@@ -236,6 +258,70 @@ public class Okno extends JFrame
 	        }
 	    }
 	   
+	  //csv button
+	    public class csvButtonHandler implements ActionListener{
+	        public void actionPerformed(ActionEvent e){
+	        	
+	        	sciezkaPliku = textfieldPoleTekstowe.getText();
+	        	String str = "";
+	        	CSVReader reader;
+				try {
+					reader = new CSVReader(new FileReader(sciezkaPliku));
+		    	    String[] row;
+		    	    try 
+		    	    {
+						while ((row = reader.readNext()) != null) 
+						{
+							for (int i = 0; i < row.length; i++) 
+						    {
+								str=str + row[i] + ", ";
+						    }
+							break;
+						}
+					}catch(IOException e1) {textfieldCSV.setText("Problem z plikem!!!");}
+				}catch(FileNotFoundException e3) {textfieldCSV.setText("Plik nie istnieje!!!");}
+				
+				textfieldCSV.setText("Kolumny: " + str);
+				
+	        }
+	    }
+	    
+	  //sql button
+	    public class sqlButtonHandler implements ActionListener{
+	        public void actionPerformed(ActionEvent e){
+	        	nazwaPliku = textfieldNazwaPliku.getText();
+	        	Connection conn = null;
+	    		Statement stmt = null;
+	    		try
+	    		{
+	    			//Register JDBC driver
+	    			Class.forName("com.mysql.jdbc.Driver");
+	    			
+	    			//Open a connection
+	    			conn = DriverManager.getConnection(DB_URL,USER,PASS);
+	    			System.out.println("Connection to database succeed.");
+	    			
+	    			//Execute a query
+	    			System.out.println("Creating statement:");
+	    			stmt = conn.createStatement();
+	    			String sql="SHOW COLUMNS FROM "+nazwaPliku+";";
+	    			String pom = "Kolumny: ";
+	    			ResultSet rs = stmt.executeQuery(sql);
+	    			//STEP 5: Extract data from result set
+	    			while(rs.next()){
+	    				
+	    				String kolumna = rs.getString(1);
+	    				pom = pom + kolumna +", ";
+		    			textfieldSQL.setText(pom);
+	    				System.out.print(kolumna);
+	    			}
+	    		    rs.close();
+	    			stmt.close();
+	    			conn.close();
+	    		}catch(Exception ex){  ex.printStackTrace();}
+	        }
+	    }
+	    
 	    //main
 	    public static void main(String[] args){
 	        Okno rectObj = new Okno();
