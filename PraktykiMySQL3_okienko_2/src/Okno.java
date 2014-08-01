@@ -30,8 +30,8 @@ public class Okno extends JFrame
 		static final String DB_URL = "jdbc:mysql://localhost/druga_baza";
 
 		//user and password
-		static final String USER = "user";
-		static final String PASS = "password";
+		static final String USER = "mysql";
+		static final String PASS = "mysql";
 		
 		private static final int WIDTH = 1200;
 	    private static final int HEIGHT = 400;
@@ -121,6 +121,10 @@ public class Okno extends JFrame
 	    }
 	    
 	    
+	    public String[] rekord = new String[1000000];
+        public int iloscKolumn=0,iloscWhile=0,iloscRekordow=0;
+	    
+	    
 
 	    //importuj button
 	    private class ImportujButtonHandler implements ActionListener
@@ -130,12 +134,12 @@ public class Okno extends JFrame
 	        	//pobieranie nazwy pliku
 	            sciezkaPliku = textfieldPoleTekstowe.getText();
 	            nazwaPliku = textfieldNazwaPliku.getText();
+
+	            for(int i=0;i<rekord.length;i++) rekord[i]=new String();
 	            
 	            //begin pobieranie danych z pliku
 	            String str="";String str2="";
-	            String[] rekord = new String[1000000];
-	            for(int i=0;i<rekord.length;i++) rekord[i]=new String();
-	            int iloscKolumn=0,iloscWhile=0,iloscRekordow=0;
+	            
 	            CSVReader reader;
 				try {
 					reader = new CSVReader(new FileReader(sciezkaPliku));
@@ -265,9 +269,12 @@ public class Okno extends JFrame
 	        }
 	    }
 	   
-	  //csv button
+	    public String[] tabKolCSV = new String[100];
+	    //csv button
 	    public class csvButtonHandler implements ActionListener{
 	        public void actionPerformed(ActionEvent e){
+	        	
+	        	for(int i=0;i<tabKolCSV.length;i++) tabKolCSV[i]=new String();
 	        	
 	        	sciezkaPliku = textfieldPoleTekstowe.getText();
 	        	String str = "";
@@ -281,7 +288,9 @@ public class Okno extends JFrame
 						{
 							for (int i = 0; i < row.length; i++) 
 						    {
+								tabKolCSV[i]=row[i];
 								str=str + row[i] + ", ";
+								//iloscKolumn=i;
 						    }
 							break;
 						}
@@ -292,10 +301,13 @@ public class Okno extends JFrame
 				
 	        }
 	    }
-	    
-	  //sql button
+	    public String[] tabKolSQL = new String[100];
+	    //sql button
 	    public class sqlButtonHandler implements ActionListener{
 	        public void actionPerformed(ActionEvent e){
+	        	
+	        	for(int i=0;i<tabKolSQL.length;i++) tabKolSQL[i]=new String();
+	        	
 	        	nazwaPliku = textfieldNazwaPliku.getText();
 	        	Connection conn = null;
 	    		Statement stmt = null;
@@ -314,10 +326,12 @@ public class Okno extends JFrame
 	    			String sql="SHOW COLUMNS FROM "+nazwaPliku+";";
 	    			String pom = "Kolumny: ";
 	    			ResultSet rs = stmt.executeQuery(sql);
+	    			int i=0;
 	    			//STEP 5: Extract data from result set
 	    			while(rs.next()){
 	    				
 	    				String kolumna = rs.getString(1);
+	    				tabKolSQL[i]=kolumna;i++;
 	    				pom = pom + kolumna +", ";
 		    			textfieldSQL.setText(pom);
 	    				System.out.print(kolumna);
@@ -328,8 +342,27 @@ public class Okno extends JFrame
 	    		}catch(Exception ex){  ex.printStackTrace();}
 	        }
 	    }
+
+	   
+	    public int getiloscKolumn() {return iloscKolumn;}
+	    public void setiloscKolumn(int iloscKolumn) {this.iloscKolumn =iloscKolumn;}
+
+	    public int getiloscWhile() {return iloscWhile;}
+	    public void setiloscWhile(int iloscWhile) {this.iloscWhile =iloscWhile;}
+    		
+	    public int getiloscRekordow() {return iloscRekordow;}
+	    public void setiloscRekordow(int iloscRekordow) {this.iloscRekordow =iloscRekordow;}
+    		
+	    public String[] getrekord() {return rekord;}
+	    public void setrekord(String[] rekord) {this.rekord =rekord;}
+    		
+	    public String[] gettabKolCSV() {return tabKolCSV;}
+	    public void settabKolCSV(String[] tabKolCSV) {this.tabKolCSV =tabKolCSV;}
+    		
+	    public String[] gettabKolSQL() {return tabKolSQL;}
+	    public void settabKolSQL(String[] tabKolSQL) {this.tabKolSQL =tabKolSQL;}
 	    
-	    
+//	    public String[] rekord = new String[1000000];
 	  //przyporzadkuj button
 	    public class przyButtonHandler implements ActionListener{
 	        public void actionPerformed(ActionEvent e){

@@ -24,6 +24,8 @@ public class Okno2 extends JFrame{
     public String kolumnaSQL;
     public String rezultatPrzyporzadkowania;
     
+ 
+    
 	public  Okno2()
     {
 		labelKolumnaCSV = new JLabel("Kolumna CSV do pryzporządkowania: ", SwingConstants.RIGHT);
@@ -72,14 +74,30 @@ public class Okno2 extends JFrame{
         	dispose();
         }
     }
-    
+    Okno pom= new Okno();
+    Okno tablicaKolCSV[]= new Okno[1000000];
+//    public String[] tablicaKolCSV = new String[100];
+//    public String[] tablicaKolSQL = new String[100];  
     
     //zapisz button
     public class zapiszButtonHandler implements ActionListener{
         public void actionPerformed(ActionEvent e){
         	kolumnaCSV = textfieldKolumnaCSV.getText();
         	kolumnaSQL = textfieldKolumnaSQL.getText();
-        	
+        	 
+        	for(int i=0;i<tablicaKolCSV.length;i++){
+        	System.out.println(tablicaKolCSV[i].getrekord()); 
+        	}
+        	if(!(kolumnaCSV.equals(null))&!(kolumnaSQL.equals(null)))
+        	{
+        		
+        	}
+        	if(!(kolumnaCSV.equals(null))&(kolumnaSQL.equals(null)))
+        	{
+        		
+        	}
+        	       	
+        	/*utwożyć tablice pomocnicza na kazdy wiersz, i pokolei zamieniać kolumny w kazdym wierszu osobno*/
             textfieldPrzyporzadkowanie.setText(rezultatPrzyporzadkowania);
         }
     }
