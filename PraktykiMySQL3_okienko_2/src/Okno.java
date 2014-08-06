@@ -49,8 +49,8 @@ public class Okno extends JFrame
 	    private sqlButtonHandler sqlHandler;
 	    private przyButtonHandler przyHandler;
 	    
-	    public String nazwaPliku;
-	    public String sciezkaPliku;
+	    public static String nazwaPliku;
+	    public static String sciezkaPliku;
 	     
 	    public Okno()
 	    {
@@ -121,8 +121,8 @@ public class Okno extends JFrame
 	    }
 	    
 	    
-	    public String[] rekord = new String[1000000];
-        public int iloscKolumn=0,iloscWhile=0,iloscRekordow=0;
+	    public static String[] rekord = new String[1000000];
+        public static int iloscKolumn=0,iloscWhile=0,iloscRekordow=0;
 	    
 	    
 
@@ -139,7 +139,9 @@ public class Okno extends JFrame
 	            
 	            //begin pobieranie danych z pliku
 	            String str="";String str2="";
-	            
+	            iloscKolumn = 0;
+	            iloscWhile = 0;
+	            iloscRekordow = 0;
 	            CSVReader reader;
 				try {
 					reader = new CSVReader(new FileReader(sciezkaPliku));
@@ -269,12 +271,13 @@ public class Okno extends JFrame
 	        }
 	    }
 	   
-	    public String[] tabKolCSV = new String[100];
+	    public static String[] tabKolCSV = new String[100];
 	    //csv button
 	    public class csvButtonHandler implements ActionListener{
 	        public void actionPerformed(ActionEvent e){
 	        	
 	        	for(int i=0;i<tabKolCSV.length;i++) tabKolCSV[i]=new String();
+	        	iloscKolumn = 0;
 	        	
 	        	sciezkaPliku = textfieldPoleTekstowe.getText();
 	        	String str = "";
@@ -290,8 +293,9 @@ public class Okno extends JFrame
 						    {
 								tabKolCSV[i]=row[i];
 								str=str + row[i] + ", ";
-								//iloscKolumn=i;
+								iloscKolumn=i;
 						    }
+							iloscKolumn = iloscKolumn + 1;
 							break;
 						}
 					}catch(IOException e1) {textfieldCSV.setText("Problem z plikem!!!");}
@@ -301,7 +305,7 @@ public class Okno extends JFrame
 				
 	        }
 	    }
-	    public String[] tabKolSQL = new String[100];
+	    public static String[] tabKolSQL = new String[100];
 	    //sql button
 	    public class sqlButtonHandler implements ActionListener{
 	        public void actionPerformed(ActionEvent e){

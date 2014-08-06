@@ -84,9 +84,9 @@ public class Okno2 extends JFrame{
         public void actionPerformed(ActionEvent e){
         	kolumnaCSV = textfieldKolumnaCSV.getText();
         	kolumnaSQL = textfieldKolumnaSQL.getText();
-        	 
-        	for(int i=0;i<tablicaKolCSV.length;i++){
-        	System.out.println(tablicaKolCSV[i].getrekord()); 
+        	System.out.println(pom.getiloscKolumn()); 
+        	for(int i=0;i<pom.getrekord().length;i++){
+        	System.out.println(pom.getrekord()); 
         	}
         	if(!(kolumnaCSV.equals(null))&!(kolumnaSQL.equals(null)))
         	{
