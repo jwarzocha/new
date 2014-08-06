@@ -75,27 +75,63 @@ public class Okno2 extends JFrame{
         }
     }
     Okno pom= new Okno();
-    Okno tablicaKolCSV[]= new Okno[1000000];
-//    public String[] tablicaKolCSV = new String[100];
-//    public String[] tablicaKolSQL = new String[100];  
-    
+    String rekordyCSV[]= new String[1000000];
+    String[] tablicaKolCSV = new String[100];
+    String[] tablicaKolSQL = new String[100];  
+    int indeksCSV,indeksSQL;
     //zapisz button
     public class zapiszButtonHandler implements ActionListener{
         public void actionPerformed(ActionEvent e){
         	kolumnaCSV = textfieldKolumnaCSV.getText();
         	kolumnaSQL = textfieldKolumnaSQL.getText();
-        	System.out.println(pom.getiloscKolumn()); 
-        	for(int i=0;i<pom.getrekord().length;i++){
-        	System.out.println(pom.getrekord()); 
+        	
+        	//System.out.println(pom.getiloscKolumn()); 
+        	for(int i=0;i<pom.getrekord().length;i++){	rekordyCSV[i] = pom.getrekord()[i];}
+        	for(int i=0;i<pom.gettabKolCSV().length;i++){	tablicaKolCSV[i] = pom.gettabKolCSV()[i];}
+        	for(int i=0;i<pom.gettabKolSQL().length;i++){	tablicaKolSQL[i] = pom.gettabKolSQL()[i];}
+        	
+        	for(int i=0;i<tablicaKolSQL.length;i++)
+        	{	
+        		if(tablicaKolSQL[i].equals(kolumnaSQL)){indeksSQL=i;break;}
         	}
-        	if(!(kolumnaCSV.equals(null))&!(kolumnaSQL.equals(null)))
-        	{
-        		
+        	
+        	for(int i=0;i<tablicaKolCSV.length;i++)
+        	{	
+        		if(tablicaKolCSV[i].equals(kolumnaCSV)){indeksCSV=i;break;}
         	}
-        	if(!(kolumnaCSV.equals(null))&(kolumnaSQL.equals(null)))
-        	{
-        		
-        	}
+        	
+        	
+        	int j;
+        	String pomoc;
+    		for(int i=pom.getiloscKolumn();i<pom.getiloscRekordow()-1;i++)
+    		{
+    			for(j=0;j<pom.getiloscKolumn();j++){
+	    			if(j==indeksCSV-1)
+	    			{
+	    				if(indeksCSV > indeksSQL)
+	    	        	{
+	    					for(int a=0;a<indeksCSV-indeksSQL;a++)
+	    					{
+	    						pomoc = rekordyCSV[i+j-a];
+	    						rekordyCSV[i+j-a]=rekordyCSV[i+j-a-1];
+	    						rekordyCSV[i+j-a] = pomoc;
+	    					}
+	    				}
+	    				if(indeksCSV < indeksSQL)
+	    				{
+	    					for(int a=0;a<indeksCSV-indeksSQL;a++)
+	    					{
+	    						pomoc = rekordyCSV[i+j+a];
+	    						rekordyCSV[i+j+a]=rekordyCSV[i+j+a+1];
+	    						rekordyCSV[i+j+a] = pomoc;
+	    					}
+	    				}
+		            }
+    			}
+    			i=i+j;
+    		}
+    		for(int i=0;i<500;i++){	System.out.println(rekordyCSV[i]);}	
+        	
         	       	
         	/*utwożyć tablice pomocnicza na kazdy wiersz, i pokolei zamieniać kolumny w kazdym wierszu osobno*/
             textfieldPrzyporzadkowanie.setText(rezultatPrzyporzadkowania);

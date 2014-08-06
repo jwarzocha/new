@@ -185,48 +185,48 @@ public class Okno extends JFrame
 	    			String sql="";
 	    	
 	    			
-	    			//begin create table
-	    			try{
-		    			System.out.println(iloscKolumn);
-		    			sql = "CREATE TABLE "+nazwaPliku+" (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, ";
-		    	        for(int i=0;i<iloscKolumn;i++){
-		    	        	rekord[i]=rekord[i].replaceAll(" ", "_");
-		    	        	if((i<iloscKolumn-1))sql=sql+rekord[i]+" VARCHAR(300), ";
-		    	        	if(i==iloscKolumn-1)sql=sql+rekord[i]+" VARCHAR(300));";
-		    	        }
-		    	        System.out.println(sql);
-		    			stmt.executeUpdate(sql);
-		    			textfieldSQL.setText("Tabela "+nazwaPliku+" została utworzona.");
-	    			}catch(SQLException e4) {textfieldSQL.setText("Taka "+nazwaPliku+" tabela już istnieje w bazie!!!");}
-	    			//end create table
-	    			
-	    			//begin insert
-	    			sql = "INSERT INTO "+nazwaPliku+" (";
-	    			
-	    			for(int i=0;i<iloscKolumn;i++){
-		    	       	rekord[i]=rekord[i].replaceAll(" ", "_");
-		    	       	if(i<iloscKolumn-1)sql=sql+rekord[i]+", ";
-		    	       	if(i==iloscKolumn-1)sql=sql+rekord[i]+") VALUES ('";
-		    	    }
-	    			System.out.println(sql);
-	    			int j;
-	    			for(int i=iloscKolumn;i<iloscRekordow-1;i++)
-	    			{
-	    				for(j=0;j<iloscKolumn;j++){
-		    				if(j!=iloscKolumn-1){
-		    					str=str+rekord[i+j]+"','";
-		    				}
-		    				if(j==iloscKolumn-1){
-			    	        	str=str+rekord[i+j]+"');";
-			    	        	str2=sql+str;
-			    	        	stmt.executeUpdate(str2);
-			    	        	System.out.println(i+"\t"+str2);
-			    	        	str2="";str="";
-			    	        }
-	    				}
-	    				i=i+j;
-	    			}
-	    			//end insert	
+//	    			//begin create table
+//	    			try{
+//		    			System.out.println(iloscKolumn);
+//		    			sql = "CREATE TABLE "+nazwaPliku+" (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, ";
+//		    	        for(int i=0;i<iloscKolumn;i++){
+//		    	        	rekord[i]=rekord[i].replaceAll(" ", "_");
+//		    	        	if((i<iloscKolumn-1))sql=sql+rekord[i]+" VARCHAR(300), ";
+//		    	        	if(i==iloscKolumn-1)sql=sql+rekord[i]+" VARCHAR(300));";
+//		    	        }
+//		    	        System.out.println(sql);
+//		    			stmt.executeUpdate(sql);
+//		    			textfieldSQL.setText("Tabela "+nazwaPliku+" została utworzona.");
+//	    			}catch(SQLException e4) {textfieldSQL.setText("Taka "+nazwaPliku+" tabela już istnieje w bazie!!!");}
+//	    			//end create table
+//	    			
+//	    			//begin insert
+//	    			sql = "INSERT INTO "+nazwaPliku+" (";
+//	    			
+//	    			for(int i=0;i<iloscKolumn;i++){
+//		    	       	rekord[i]=rekord[i].replaceAll(" ", "_");
+//		    	       	if(i<iloscKolumn-1)sql=sql+rekord[i]+", ";
+//		    	       	if(i==iloscKolumn-1)sql=sql+rekord[i]+") VALUES ('";
+//		    	    }
+//	    			System.out.println(sql);
+//	    			int j;
+//	    			for(int i=iloscKolumn;i<iloscRekordow-1;i++)
+//	    			{
+//	    				for(j=0;j<iloscKolumn;j++){
+//		    				if(j!=iloscKolumn-1){
+//		    					str=str+rekord[i+j]+"','";
+//		    				}
+//		    				if(j==iloscKolumn-1){
+//			    	        	str=str+rekord[i+j]+"');";
+//			    	        	str2=sql+str;
+//			    	        	stmt.executeUpdate(str2);
+//			    	        	System.out.println(i+"\t"+str2);
+//			    	        	str2="";str="";
+//			    	        }
+//	    				}
+//	    				i=i+j;
+//	    			}
+//	    			//end insert	
 	    			textfieldSQL.setText("Wstawianie do "+nazwaPliku+" zakończone pomyślnie.");
 	    			stmt.close();
 	    			conn.close();
