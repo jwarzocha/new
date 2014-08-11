@@ -100,39 +100,53 @@ public class Okno2 extends JFrame{
         		if(tablicaKolCSV[i].equals(kolumnaCSV)){indeksCSV=i;break;}
         	}
         	
-        	
+        	System.out.println("CSV-"+indeksCSV+"\nSQL-"+indeksSQL);
         	int j;
         	String pomoc;
     		for(int i=pom.getiloscKolumn();i<pom.getiloscRekordow()-1;i++)
     		{
+    			System.out.println("i="+i);
     			for(j=0;j<pom.getiloscKolumn();j++){
 	    			if(j==indeksCSV-1)
 	    			{
+	    				System.out.println("j="+indeksCSV);
 	    				if(indeksCSV > indeksSQL)
 	    	        	{
-	    					for(int a=0;a<indeksCSV-indeksSQL;a++)
+	    					System.out.println("CSV > SQL");
+	    					for(int a=-1;a<indeksCSV-indeksSQL;a++)
 	    					{
+	    						System.out.println("a="+a);
 	    						pomoc = rekordyCSV[i+j-a];
 	    						rekordyCSV[i+j-a]=rekordyCSV[i+j-a-1];
-	    						rekordyCSV[i+j-a] = pomoc;
+	    						rekordyCSV[i+j-a-1] = pomoc;
+	    						System.out.println("\tpomoc="+pomoc);
+	    						System.out.println("\trekordyCSV["+(i+j-a)+"]="+rekordyCSV[i+j-a]);
+	    						System.out.println("\trekordyCSV["+(i+j-a-1)+"]="+rekordyCSV[i+j-a-1]+"\n");
 	    					}
 	    				}
 	    				if(indeksCSV < indeksSQL)
 	    				{
-	    					for(int a=0;a<indeksCSV-indeksSQL;a++)
+	    					System.out.println("CSV < SQL");
+	    					for(int a=1;a<indeksSQL-indeksCSV;a++)
 	    					{
+	    						System.out.println("a="+a);
 	    						pomoc = rekordyCSV[i+j+a];
 	    						rekordyCSV[i+j+a]=rekordyCSV[i+j+a+1];
-	    						rekordyCSV[i+j+a] = pomoc;
+	    						rekordyCSV[i+j+a+1] = pomoc;
+	    						System.out.println("\tpomoc="+pomoc);
+	    						System.out.println("\trekordyCSV["+(i+j+a)+"]="+rekordyCSV[i+j+a]);
+	    						System.out.println("\trekordyCSV["+(i+j+a+1)+"]="+rekordyCSV[i+j+a+1]+"\n");
 	    					}
 	    				}
 		            }
     			}
     			i=i+j;
     		}
-    		for(int i=0;i<500;i++){	System.out.println(rekordyCSV[i]);}	
-        	
-        	       	
+//    		for(int i=0;i<500;i++){
+//    			
+//    			System.out.println("-\t"+rekordyCSV[i]);}	
+
+    		pom.setrekord(rekordyCSV);     	
         	/*utwożyć tablice pomocnicza na kazdy wiersz, i pokolei zamieniać kolumny w kazdym wierszu osobno*/
             textfieldPrzyporzadkowanie.setText(rezultatPrzyporzadkowania);
         }

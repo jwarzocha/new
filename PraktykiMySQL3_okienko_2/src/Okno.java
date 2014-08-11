@@ -183,50 +183,92 @@ public class Okno extends JFrame
 	    			System.out.println("Creating statement:");
 	    			stmt = conn.createStatement();
 	    			String sql="";
-	    	
+	    	    			
 	    			
-//	    			//begin create table
-//	    			try{
-//		    			System.out.println(iloscKolumn);
-//		    			sql = "CREATE TABLE "+nazwaPliku+" (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, ";
-//		    	        for(int i=0;i<iloscKolumn;i++){
-//		    	        	rekord[i]=rekord[i].replaceAll(" ", "_");
-//		    	        	if((i<iloscKolumn-1))sql=sql+rekord[i]+" VARCHAR(300), ";
-//		    	        	if(i==iloscKolumn-1)sql=sql+rekord[i]+" VARCHAR(300));";
-//		    	        }
-//		    	        System.out.println(sql);
-//		    			stmt.executeUpdate(sql);
-//		    			textfieldSQL.setText("Tabela "+nazwaPliku+" została utworzona.");
-//	    			}catch(SQLException e4) {textfieldSQL.setText("Taka "+nazwaPliku+" tabela już istnieje w bazie!!!");}
-//	    			//end create table
-//	    			
-//	    			//begin insert
-//	    			sql = "INSERT INTO "+nazwaPliku+" (";
-//	    			
-//	    			for(int i=0;i<iloscKolumn;i++){
-//		    	       	rekord[i]=rekord[i].replaceAll(" ", "_");
-//		    	       	if(i<iloscKolumn-1)sql=sql+rekord[i]+", ";
-//		    	       	if(i==iloscKolumn-1)sql=sql+rekord[i]+") VALUES ('";
-//		    	    }
-//	    			System.out.println(sql);
-//	    			int j;
-//	    			for(int i=iloscKolumn;i<iloscRekordow-1;i++)
-//	    			{
-//	    				for(j=0;j<iloscKolumn;j++){
-//		    				if(j!=iloscKolumn-1){
-//		    					str=str+rekord[i+j]+"','";
-//		    				}
-//		    				if(j==iloscKolumn-1){
-//			    	        	str=str+rekord[i+j]+"');";
-//			    	        	str2=sql+str;
-//			    	        	stmt.executeUpdate(str2);
-//			    	        	System.out.println(i+"\t"+str2);
-//			    	        	str2="";str="";
-//			    	        }
-//	    				}
-//	    				i=i+j;
-//	    			}
-//	    			//end insert	
+	    			//begin create table
+	    			try{
+		    			System.out.println(iloscKolumn);
+		    			sql = "CREATE TABLE "+nazwaPliku+" (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, ";
+		    	        for(int i=0;i<iloscKolumn;i++){
+		    	        	rekord[i]=rekord[i].replaceAll(" ", "_");
+		    	        	if((i<iloscKolumn-1))sql=sql+rekord[i]+" VARCHAR(300), ";
+		    	        	if(i==iloscKolumn-1)sql=sql+rekord[i]+" VARCHAR(300));";
+		    	        }
+		    	        System.out.println(sql);
+		    			stmt.executeUpdate(sql);
+		    			textfieldSQL.setText("Tabela "+nazwaPliku+" została utworzona.");
+	    			}catch(SQLException e4) {textfieldSQL.setText("Taka "+nazwaPliku+" tabela już istnieje w bazie!!!");}
+	    			//end create table
+			
+	    			
+	    			
+	    			sql="SHOW COLUMNS FROM "+nazwaPliku+";";
+	    			ResultSet rs = stmt.executeQuery(sql);
+	    			int pom=0;
+	    			while(rs.next()){
+	    				
+	    				String kolumna = rs.getString(1);
+	    				Pattern pattern = Pattern.compile("[Kk]od.[Pp]ocztowy");
+						Matcher matcherpattern = pattern.matcher(kolumna);
+						matcherpattern.reset();
+						boolean found = matcherpattern.find();
+						if(found){
+							System.out.println(pom+"\t"+kolumna);
+							break;
+						}
+	    				pom++;
+	    			}
+	    		    rs.close();
+	    		    
+	    		    int a;
+	    			for(int i=iloscKolumn;i<iloscRekordow-1;i++)
+	    			{
+	    				for(a=0;a<iloscKolumn;a++){
+		    				
+		    				if(a==pom-1){
+			    	        	Pattern patternKod = Pattern.compile("[0-9]{2}-[0-9]{3}");
+								Matcher matcherpatternKod = patternKod.matcher(rekord[i+a]);
+								matcherpatternKod.reset();
+								boolean foundKod = matcherpatternKod.find();
+								if(!foundKod){
+									System.out.println(rekord[i+a]);
+									rekord[i+a]="";
+								}
+		    				
+		    				}
+	    				}
+	    				i=i+a;
+	    			}
+	    		    
+	    		    
+	    			
+	    			//begin insert
+	    			sql = "INSERT INTO "+nazwaPliku+" (";
+	    			
+	    			for(int i=0;i<iloscKolumn;i++){
+		    	       	rekord[i]=rekord[i].replaceAll(" ", "_");
+		    	       	if(i<iloscKolumn-1)sql=sql+rekord[i]+", ";
+		    	       	if(i==iloscKolumn-1)sql=sql+rekord[i]+") VALUES ('";
+		    	    }
+	    			System.out.println(sql);
+	    			int j;
+	    			for(int i=iloscKolumn;i<iloscRekordow-1;i++)
+	    			{
+	    				for(j=0;j<iloscKolumn;j++){
+		    				if(j!=iloscKolumn-1){
+		    					str=str+rekord[i+j]+"','";
+		    				}
+		    				if(j==iloscKolumn-1){
+			    	        	str=str+rekord[i+j]+"');";
+			    	        	str2=sql+str;
+			    	        	stmt.executeUpdate(str2);
+			    	        	System.out.println(i+"\t"+str2);
+			    	        	str2="";str="";
+			    	        }
+	    				}
+	    				i=i+j;
+	    			}
+	    			//end insert	
 	    			textfieldSQL.setText("Wstawianie do "+nazwaPliku+" zakończone pomyślnie.");
 	    			stmt.close();
 	    			conn.close();
@@ -377,6 +419,7 @@ public class Okno extends JFrame
 	    public static void main(String[] args){
 	        Okno rectObj = new Okno();
 	    }
+
 	    	
 }
 	
