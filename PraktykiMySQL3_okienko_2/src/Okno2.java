@@ -51,7 +51,7 @@ public class Okno2 extends JFrame{
 		labelKolumnaSQL = new JLabel("Kolumna SQL do przyporządkowania: ", SwingConstants.RIGHT);
 		textfieldKolumnaSQL = new JTextField(10);
 	        
-		labelPrzyporzadkowanie = new JLabel("Przyporządkowanie: ", SwingConstants.RIGHT);
+		labelPrzyporzadkowanie = new JLabel("Informacje: ", SwingConstants.RIGHT);
 		textfieldPrzyporzadkowanie = new JTextField(10);
         
 		zapisz = new JButton("Zapisz zmiany");
@@ -177,7 +177,7 @@ public class Okno2 extends JFrame{
     		
     		
     		
-    		textfieldPrzyporzadkowanie.setText(rezultatPrzyporzadkowania);
+    		textfieldPrzyporzadkowanie.setText("Zamiana miejsca kolumny zaończona.");
         }
     }
     
@@ -200,7 +200,20 @@ public class Okno2 extends JFrame{
     			stmt = conn.createStatement();
     			String sql="";
     			
-    			
+    			//begin create table
+        		try{
+        			System.out.println(pom.getiloscKolumn());
+        			sql = "CREATE TABLE "+pom.getnazwaPliku()+" (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, ";
+        			for(int i=0;i<pom.getiloscKolumn();i++){
+        			    rekordyCSV[i]=rekordyCSV[i].replaceAll(" ", "_");
+        			    if((i<pom.getiloscKolumn()-1))sql=sql+rekordyCSV[i]+" VARCHAR(300), ";
+        			    if(i==pom.getiloscKolumn()-1)sql=sql+rekordyCSV[i]+" VARCHAR(300), data TIMESTAMP DEFAULT CURRENT_TIMESTAMP);";
+        			}
+        			System.out.println(sql);
+        			stmt.executeUpdate(sql);
+        			textfieldPrzyporzadkowanie.setText("Tabela "+pom.getnazwaPliku()+" została utworzona.");
+        		}catch(SQLException e4) {textfieldPrzyporzadkowanie.setText("Taka "+pom.getnazwaPliku()+" tabela już istnieje w bazie!!!");}
+        		//end create table
     			
     			sql="SHOW COLUMNS FROM "+pom.getnazwaPliku()+";";
     			ResultSet rs = stmt.executeQuery(sql);
@@ -268,6 +281,7 @@ public class Okno2 extends JFrame{
     				}
     				i=i+z;
     			}
+    			textfieldPrzyporzadkowanie.setText("Wstawianie zakończone pomyślnie.");
     			//end insert	
     			stmt.close();
     			conn.close();
