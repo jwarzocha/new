@@ -2,6 +2,13 @@ import java.awt.Container;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -13,12 +20,22 @@ import javax.swing.SwingConstants;
 
 public class Okno2 extends JFrame{
 	
+	//JDBC driver name and database URL
+	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";  
+	static final String DB_URL = "jdbc:mysql://localhost/druga_baza";
+
+	//user and password
+	static final String USER = "user";
+	static final String PASS = "password";
+	
+	
 	private JLabel labelKolumnaCSV, labelKolumnaSQL, labelPrzyporzadkowanie;
 	private JTextField textfieldKolumnaCSV, textfieldKolumnaSQL, textfieldPrzyporzadkowanie;
-	private JButton zapisz, wyjdz;
+	private JButton zapisz, wyjdz, wstaw;
 	
 	private zapiszButtonHandler zapiszHandler;
     private wyjdz2ButtonHandler wyjdzHandler;
+    private wstawButtonHandler wstawHandler;
     
     public String kolumnaCSV;
     public String kolumnaSQL;
@@ -28,16 +45,16 @@ public class Okno2 extends JFrame{
     
 	public  Okno2()
     {
-		labelKolumnaCSV = new JLabel("Kolumna CSV do pryzporządkowania: ", SwingConstants.RIGHT);
+		labelKolumnaCSV = new JLabel("Kolumna CSV do przyporządkowania: ", SwingConstants.RIGHT);
 		textfieldKolumnaCSV = new JTextField(10);
 	        
-		labelKolumnaSQL = new JLabel("Kolumna SQL do pryzporządkowania: ", SwingConstants.RIGHT);
+		labelKolumnaSQL = new JLabel("Kolumna SQL do przyporządkowania: ", SwingConstants.RIGHT);
 		textfieldKolumnaSQL = new JTextField(10);
 	        
 		labelPrzyporzadkowanie = new JLabel("Przyporządkowanie: ", SwingConstants.RIGHT);
 		textfieldPrzyporzadkowanie = new JTextField(10);
         
-		zapisz = new JButton("Zapisz dane");
+		zapisz = new JButton("Zapisz zmiany");
 		zapiszHandler = new zapiszButtonHandler();
 		zapisz.addActionListener(zapiszHandler);
         
@@ -45,9 +62,13 @@ public class Okno2 extends JFrame{
         wyjdzHandler = new wyjdz2ButtonHandler();
         wyjdz.addActionListener(wyjdzHandler);
         
+        wstaw = new JButton("Wstaw do bazy");
+        wstawHandler = new wstawButtonHandler();
+        wstaw.addActionListener(wstawHandler);
+        
         setTitle("Przyporządkowanie kolumn");
         Container pane = getContentPane();
-        pane.setLayout(new GridLayout(4, 2));
+        pane.setLayout(new GridLayout(5, 2));
         
 		
         pane.add(labelKolumnaCSV);
@@ -61,6 +82,7 @@ public class Okno2 extends JFrame{
         
         pane.add(zapisz);
         pane.add(wyjdz);
+        pane.add(wstaw);
         
         setSize(1200, 300);
         setVisible(true);
@@ -142,14 +164,121 @@ public class Okno2 extends JFrame{
     			}
     			i=i+j;
     		}
-//    		for(int i=0;i<500;i++){
-//    			
-//    			System.out.println("-\t"+rekordyCSV[i]);}	
+    		for(int i=0;i<24;i++){
+    			
+    			System.out.println("-\t"+rekordyCSV[i]);}	
 
-    		pom.setrekord(rekordyCSV);     	
-        	/*utwożyć tablice pomocnicza na kazdy wiersz, i pokolei zamieniać kolumny w kazdym wierszu osobno*/
-            textfieldPrzyporzadkowanie.setText(rezultatPrzyporzadkowania);
+//    		pom.setrekord(rekordyCSV);     
+    		
+    		
+    	   
+    		//napis końcowy
+    		System.out.println("kk"); 
+    		
+    		
+    		
+    		textfieldPrzyporzadkowanie.setText(rezultatPrzyporzadkowania);
         }
     }
     
+    //wstaw
+    public class wstawButtonHandler implements ActionListener{
+        public void actionPerformed(ActionEvent e){
+        	Connection conn = null;
+    		Statement stmt = null;
+    		try
+    		{
+    			//Register JDBC driver
+    			Class.forName("com.mysql.jdbc.Driver");
+    			
+    			//Open a connection
+    			conn = DriverManager.getConnection(DB_URL,USER,PASS);
+    			System.out.println("Connection to database succeed.");
+    			
+    			//Execute a query
+    			System.out.println("Creating statement:");
+    			stmt = conn.createStatement();
+    			String sql="";
+    			
+    			
+    			
+    			sql="SHOW COLUMNS FROM "+pom.getnazwaPliku()+";";
+    			ResultSet rs = stmt.executeQuery(sql);
+    			int pomoc2=0;
+    			while(rs.next()){
+    				
+    				String kolumna = rs.getString(1);
+    				Pattern pattern = Pattern.compile("[Kk]od.[Pp]ocztowy");
+					Matcher matcherpattern = pattern.matcher(kolumna);
+					matcherpattern.reset();
+					boolean found = matcherpattern.find();
+					if(found){
+						System.out.println(pomoc2+"\t"+kolumna);
+						break;
+					}
+    				pomoc2++;
+    			}
+    		    rs.close();
+    		   
+    		    int a;
+    			for(int i=pom.getiloscKolumn();i<pom.getiloscRekordow()-1;i++)
+    			{
+    				for(a=0;a<pom.getiloscKolumn();a++){
+	    				
+	    				if(a==pomoc2-1){
+		    	        	Pattern patternKod = Pattern.compile("[0-9]{2}-[0-9]{3}");
+							Matcher matcherpatternKod = patternKod.matcher(rekordyCSV[i+a]);
+							matcherpatternKod.reset();
+							boolean foundKod = matcherpatternKod.find();
+							if(!foundKod){
+								System.out.println(rekordyCSV[i+a]);
+								rekordyCSV[i+a]="";
+							}
+	    				
+	    				}
+    				}
+    				i=i+a;
+    			}
+    			System.out.println(pom.getnazwaPliku());
+    		    String str="",str2="";
+    			
+    			//begin insert
+    			sql = "INSERT INTO "+pom.getnazwaPliku()+" (";
+    			
+    			for(int i=0;i<pom.getiloscKolumn();i++){
+    				rekordyCSV[i]=rekordyCSV[i].replaceAll(" ", "_");
+	    	       	if(i<pom.getiloscKolumn()-1)sql=sql+rekordyCSV[i]+", ";
+	    	       	if(i==pom.getiloscKolumn()-1)sql=sql+rekordyCSV[i]+") VALUES ('";
+	    	    }
+    			System.out.println(sql);
+    			int z;
+    			for(int i=pom.getiloscKolumn();i<pom.getiloscRekordow()-1;i++)
+    			{
+    				for(z=0;z<pom.getiloscKolumn();z++){
+	    				if(z!=pom.getiloscKolumn()-1){
+	    					str=str+rekordyCSV[i+z]+"','";
+	    				}
+	    				if(z==pom.getiloscKolumn()-1){
+		    	        	str=str+rekordyCSV[i+z]+"');";
+		    	        	str2=sql+str;
+		    	        	stmt.executeUpdate(str2);
+		    	        	System.out.println(i+"\t"+str2);
+		    	        	str2="";str="";
+		    	        }
+    				}
+    				i=i+z;
+    			}
+    			//end insert	
+    			stmt.close();
+    			conn.close();
+    		}
+    		catch(SQLException se){}//Handle errors for JDBC
+    		catch(Exception ex){  ex.printStackTrace();}//Handle errors for Class.forName
+    		finally
+    		{//finally block used to close resources
+    			try{if(stmt!=null) stmt.close();}catch(SQLException se2){}// nothing we can do
+    			try{if(conn!=null) conn.close();}catch(SQLException se){se.printStackTrace();}//end try        
+    		}//end finally
+        }
+    }
 }

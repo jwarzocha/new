@@ -39,7 +39,7 @@ public class Okno extends JFrame
 	    private JLabel labelTekst, labelNazwa, labelCSV, labelSQL;
 	    private JTextField textfieldPoleTekstowe, textfieldNazwaPliku;
 	    private JTextField textfieldCSV, textfieldSQL;
-	    private JButton importuj, wyjdz, wybierz, pokazCSV, pokazSQL, przyporzadkuj;
+	    private JButton importuj, wyjdz, wybierz, pokazCSV, pokazSQL, przyporzadkuj, wstaw;
 	     
 	    //Button handlers:
 	    private ImportujButtonHandler cbHandler;
@@ -48,6 +48,7 @@ public class Okno extends JFrame
 	    private csvButtonHandler csvHandler;
 	    private sqlButtonHandler sqlHandler;
 	    private przyButtonHandler przyHandler;
+	    private wstawButtonHandler wstawHandler;
 	    
 	    public static String nazwaPliku;
 	    public static String sciezkaPliku;
@@ -91,9 +92,13 @@ public class Okno extends JFrame
 	        przyHandler = new przyButtonHandler();
 	        przyporzadkuj.addActionListener(przyHandler);
 	        
+	        wstaw = new JButton("Wstaw do bazy");
+	        wstawHandler = new wstawButtonHandler();
+	        wstaw.addActionListener(wstawHandler);
+	        
 	        setTitle("Okienko");
 	        Container pane = getContentPane();
-	        pane.setLayout(new GridLayout(7, 2));
+	        pane.setLayout(new GridLayout(8, 2));
 	         
 	        //Add things to the pane in the order you want them to appear (left to right, top to bottom)
 	        pane.add(labelTekst);
@@ -114,6 +119,7 @@ public class Okno extends JFrame
 	        pane.add(pokazCSV);
 	        pane.add(pokazSQL);
 	        pane.add(przyporzadkuj);
+	        pane.add(wstaw);
 	        
 	        setSize(WIDTH, HEIGHT);
 	        setVisible(true);
@@ -138,7 +144,7 @@ public class Okno extends JFrame
 	            for(int i=0;i<rekord.length;i++) rekord[i]=new String();
 	            
 	            //begin pobieranie danych z pliku
-	            String str="";String str2="";
+	            
 	            iloscKolumn = 0;
 	            iloscWhile = 0;
 	            iloscRekordow = 0;
@@ -166,120 +172,6 @@ public class Okno extends JFrame
 				//end pobieranie danych z pliku
 				
 
-//---------------WRZUCANIE DANYCH DO BAZY DANYCH----------------------------------------------	
-    	    
-	    		Connection conn = null;
-	    		Statement stmt = null;
-	    		try
-	    		{
-	    			//Register JDBC driver
-	    			Class.forName("com.mysql.jdbc.Driver");
-	    			
-	    			//Open a connection
-	    			conn = DriverManager.getConnection(DB_URL,USER,PASS);
-	    			System.out.println("Connection to database succeed.");
-	    			
-	    			//Execute a query
-	    			System.out.println("Creating statement:");
-	    			stmt = conn.createStatement();
-	    			String sql="";
-	    	    			
-	    			
-	    			//begin create table
-	    			try{
-		    			System.out.println(iloscKolumn);
-		    			sql = "CREATE TABLE "+nazwaPliku+" (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, ";
-		    	        for(int i=0;i<iloscKolumn;i++){
-		    	        	rekord[i]=rekord[i].replaceAll(" ", "_");
-		    	        	if((i<iloscKolumn-1))sql=sql+rekord[i]+" VARCHAR(300), ";
-		    	        	if(i==iloscKolumn-1)sql=sql+rekord[i]+" VARCHAR(300));";
-		    	        }
-		    	        System.out.println(sql);
-		    			stmt.executeUpdate(sql);
-		    			textfieldSQL.setText("Tabela "+nazwaPliku+" została utworzona.");
-	    			}catch(SQLException e4) {textfieldSQL.setText("Taka "+nazwaPliku+" tabela już istnieje w bazie!!!");}
-	    			//end create table
-			
-	    			
-	    			
-	    			sql="SHOW COLUMNS FROM "+nazwaPliku+";";
-	    			ResultSet rs = stmt.executeQuery(sql);
-	    			int pom=0;
-	    			while(rs.next()){
-	    				
-	    				String kolumna = rs.getString(1);
-	    				Pattern pattern = Pattern.compile("[Kk]od.[Pp]ocztowy");
-						Matcher matcherpattern = pattern.matcher(kolumna);
-						matcherpattern.reset();
-						boolean found = matcherpattern.find();
-						if(found){
-							System.out.println(pom+"\t"+kolumna);
-							break;
-						}
-	    				pom++;
-	    			}
-	    		    rs.close();
-	    		    
-	    		    int a;
-	    			for(int i=iloscKolumn;i<iloscRekordow-1;i++)
-	    			{
-	    				for(a=0;a<iloscKolumn;a++){
-		    				
-		    				if(a==pom-1){
-			    	        	Pattern patternKod = Pattern.compile("[0-9]{2}-[0-9]{3}");
-								Matcher matcherpatternKod = patternKod.matcher(rekord[i+a]);
-								matcherpatternKod.reset();
-								boolean foundKod = matcherpatternKod.find();
-								if(!foundKod){
-									System.out.println(rekord[i+a]);
-									rekord[i+a]="";
-								}
-		    				
-		    				}
-	    				}
-	    				i=i+a;
-	    			}
-	    		    
-	    		    
-	    			
-	    			//begin insert
-	    			sql = "INSERT INTO "+nazwaPliku+" (";
-	    			
-	    			for(int i=0;i<iloscKolumn;i++){
-		    	       	rekord[i]=rekord[i].replaceAll(" ", "_");
-		    	       	if(i<iloscKolumn-1)sql=sql+rekord[i]+", ";
-		    	       	if(i==iloscKolumn-1)sql=sql+rekord[i]+") VALUES ('";
-		    	    }
-	    			System.out.println(sql);
-	    			int j;
-	    			for(int i=iloscKolumn;i<iloscRekordow-1;i++)
-	    			{
-	    				for(j=0;j<iloscKolumn;j++){
-		    				if(j!=iloscKolumn-1){
-		    					str=str+rekord[i+j]+"','";
-		    				}
-		    				if(j==iloscKolumn-1){
-			    	        	str=str+rekord[i+j]+"');";
-			    	        	str2=sql+str;
-			    	        	stmt.executeUpdate(str2);
-			    	        	System.out.println(i+"\t"+str2);
-			    	        	str2="";str="";
-			    	        }
-	    				}
-	    				i=i+j;
-	    			}
-	    			//end insert	
-	    			textfieldSQL.setText("Wstawianie do "+nazwaPliku+" zakończone pomyślnie.");
-	    			stmt.close();
-	    			conn.close();
-	    		}
-	    		catch(SQLException se){textfieldSQL.setText("Sprawdź połączenie z bazą danych.");}//Handle errors for JDBC
-	    		catch(Exception ex){  ex.printStackTrace();}//Handle errors for Class.forName
-	    		finally
-	    		{//finally block used to close resources
-	    			try{if(stmt!=null) stmt.close();}catch(SQLException se2){}// nothing we can do
-	    			try{if(conn!=null) conn.close();}catch(SQLException se){se.printStackTrace();}//end try        
-	    		}//end finally
 	    	   
 	    		//napis końcowy
 	    		System.out.println("kk");     
@@ -292,7 +184,8 @@ public class Okno extends JFrame
 	    //wyjscie button
 	    public class wyjdzButtonHandler implements ActionListener{
 	        public void actionPerformed(ActionEvent e){
-	            System.exit(0);
+	        	setVisible(false); 
+	        	dispose();
 	        }
 	    }
 	    
@@ -388,7 +281,8 @@ public class Okno extends JFrame
 	    		}catch(Exception ex){  ex.printStackTrace();}
 	        }
 	    }
-
+	    
+	    public String getnazwaPliku() {return nazwaPliku;}
 	   
 	    public int getiloscKolumn() {return iloscKolumn;}
 	    public void setiloscKolumn(int iloscKolumn) {this.iloscKolumn =iloscKolumn;}
@@ -413,6 +307,126 @@ public class Okno extends JFrame
 	    public class przyButtonHandler implements ActionListener{
 	        public void actionPerformed(ActionEvent e){
 	        	Okno2 rectsObj = new Okno2();
+	        }
+	    }
+	    
+	    public class wstawButtonHandler implements ActionListener{
+	        public void actionPerformed(ActionEvent e){
+	        	String str="";String str2="";
+	        	//---------------WRZUCANIE DANYCH DO BAZY DANYCH----------------------------------------------	
+	        	    	    
+	        		    		Connection conn = null;
+	        		    		Statement stmt = null;
+	        		    		try
+	        		    		{
+	        		    			//Register JDBC driver
+	        		    			Class.forName("com.mysql.jdbc.Driver");
+	        		    			
+	        		    			//Open a connection
+	        		    			conn = DriverManager.getConnection(DB_URL,USER,PASS);
+	        		    			System.out.println("Connection to database succeed.");
+	        		    			
+	        		    			//Execute a query
+	        		    			System.out.println("Creating statement:");
+	        		    			stmt = conn.createStatement();
+	        		    			String sql="";
+	        		    	    			
+	        		    			
+	        		    			//begin create table
+	        		    			try{
+	        			    			System.out.println(iloscKolumn);
+	        			    			sql = "CREATE TABLE "+nazwaPliku+" (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, ";
+	        			    	        for(int i=0;i<iloscKolumn;i++){
+	        			    	        	rekord[i]=rekord[i].replaceAll(" ", "_");
+	        			    	        	if((i<iloscKolumn-1))sql=sql+rekord[i]+" VARCHAR(300), ";
+	        			    	        	if(i==iloscKolumn-1)sql=sql+rekord[i]+" VARCHAR(300));";
+	        			    	        }
+	        			    	        System.out.println(sql);
+	        			    			stmt.executeUpdate(sql);
+	        			    			textfieldSQL.setText("Tabela "+nazwaPliku+" została utworzona.");
+	        		    			}catch(SQLException e4) {textfieldSQL.setText("Taka "+nazwaPliku+" tabela już istnieje w bazie!!!");}
+	        		    			//end create table
+	        				
+	        		    			
+	        		    			
+	        		    			sql="SHOW COLUMNS FROM "+nazwaPliku+";";
+	        		    			ResultSet rs = stmt.executeQuery(sql);
+	        		    			int pom=0;
+	        		    			while(rs.next()){
+	        		    				
+	        		    				String kolumna = rs.getString(1);
+	        		    				Pattern pattern = Pattern.compile("[Kk]od.[Pp]ocztowy");
+	        							Matcher matcherpattern = pattern.matcher(kolumna);
+	        							matcherpattern.reset();
+	        							boolean found = matcherpattern.find();
+	        							if(found){
+	        								System.out.println(pom+"\t"+kolumna);
+	        								break;
+	        							}
+	        		    				pom++;
+	        		    			}
+	        		    		    rs.close();
+	        		    		    
+	        		    		    int a;
+	        		    			for(int i=iloscKolumn;i<iloscRekordow-1;i++)
+	        		    			{
+	        		    				for(a=0;a<iloscKolumn;a++){
+	        			    				
+	        			    				if(a==pom-1){
+	        				    	        	Pattern patternKod = Pattern.compile("[0-9]{2}-[0-9]{3}");
+	        									Matcher matcherpatternKod = patternKod.matcher(rekord[i+a]);
+	        									matcherpatternKod.reset();
+	        									boolean foundKod = matcherpatternKod.find();
+	        									if(!foundKod){
+	        										System.out.println(rekord[i+a]);
+	        										rekord[i+a]="";
+	        									}
+	        			    				
+	        			    				}
+	        		    				}
+	        		    				i=i+a;
+	        		    			}
+	        		    		    
+	        		    		    
+	        		    			
+	        		    			//begin insert
+	        		    			sql = "INSERT INTO "+nazwaPliku+" (";
+	        		    			
+	        		    			for(int i=0;i<iloscKolumn;i++){
+	        			    	       	rekord[i]=rekord[i].replaceAll(" ", "_");
+	        			    	       	if(i<iloscKolumn-1)sql=sql+rekord[i]+", ";
+	        			    	       	if(i==iloscKolumn-1)sql=sql+rekord[i]+") VALUES ('";
+	        			    	    }
+	        		    			System.out.println(sql);
+	        		    			int j;
+	        		    			for(int i=iloscKolumn;i<iloscRekordow-1;i++)
+	        		    			{
+	        		    				for(j=0;j<iloscKolumn;j++){
+	        			    				if(j!=iloscKolumn-1){
+	        			    					str=str+rekord[i+j]+"','";
+	        			    				}
+	        			    				if(j==iloscKolumn-1){
+	        				    	        	str=str+rekord[i+j]+"');";
+	        				    	        	str2=sql+str;
+	        				    	        	stmt.executeUpdate(str2);
+	        				    	        	System.out.println(i+"\t"+str2);
+	        				    	        	str2="";str="";
+	        				    	        }
+	        		    				}
+	        		    				i=i+j;
+	        		    			}
+	        		    			//end insert	
+	        		    			textfieldSQL.setText("Wstawianie do "+nazwaPliku+" zakończone pomyślnie.");
+	        		    			stmt.close();
+	        		    			conn.close();
+	        		    		}
+	        		    		catch(SQLException se){textfieldSQL.setText("Sprawdź połączenie z bazą danych.");}//Handle errors for JDBC
+	        		    		catch(Exception ex){  ex.printStackTrace();}//Handle errors for Class.forName
+	        		    		finally
+	        		    		{//finally block used to close resources
+	        		    			try{if(stmt!=null) stmt.close();}catch(SQLException se2){}// nothing we can do
+	        		    			try{if(conn!=null) conn.close();}catch(SQLException se){se.printStackTrace();}//end try        
+	        		    		}//end finally
 	        }
 	    }
 	    //main
