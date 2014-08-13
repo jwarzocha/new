@@ -172,7 +172,47 @@ public class Okno extends JFrame
 				}catch(FileNotFoundException e3) {e3.printStackTrace();}
 				//end pobieranie danych z pliku
 				
-
+	    	    
+				Connection conn = null;
+				Statement stmt = null;
+				try
+				{
+					//Register JDBC driver
+					Class.forName("com.mysql.jdbc.Driver");
+					    			
+					//Open a connection
+					conn = DriverManager.getConnection(DB_URL,USER,PASS);
+					System.out.println("Connection to database succeed.");
+					    			
+					//Execute a query
+					System.out.println("Creating statement:");
+					stmt = conn.createStatement();
+					    			String sql="";
+					//begin create table
+					try{
+						System.out.println(iloscKolumn);
+						sql = "CREATE TABLE "+nazwaPliku+" (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, ";
+						for(int i=0;i<iloscKolumn;i++){
+						    rekord[i]=rekord[i].replaceAll(" ", "_");
+						    if((i<iloscKolumn-1))sql=sql+rekord[i]+" VARCHAR(300), ";
+						    if(i==iloscKolumn-1)sql=sql+rekord[i]+" VARCHAR(300), data TIMESTAMP DEFAULT CURRENT_TIMESTAMP);";
+						}
+						System.out.println(sql);
+						stmt.executeUpdate(sql);
+						textfieldSQL.setText("Tabela "+nazwaPliku+" została utworzona.");
+					}catch(SQLException e4) {textfieldSQL.setText("Taka "+nazwaPliku+" tabela już istnieje w bazie!!!");}
+					//end create table
+					stmt.close();
+	        		conn.close();
+	        	}
+	        	catch(SQLException se){textfieldSQL.setText("Sprawdź połączenie z bazą danych.");}//Handle errors for JDBC
+	        	catch(Exception ex){  ex.printStackTrace();}//Handle errors for Class.forName
+	        	finally
+	        	{//finally block used to close resources
+	        		try{if(stmt!=null) stmt.close();}catch(SQLException se2){}// nothing we can do
+	        		try{if(conn!=null) conn.close();}catch(SQLException se){se.printStackTrace();}//end try        
+	        	}//end finally	
+					
 	    		//napis końcowy
 	    		System.out.println("kk");     
 	        }
@@ -330,24 +370,7 @@ public class Okno extends JFrame
 	        		System.out.println("Creating statement:");
 	        		stmt = conn.createStatement();
 	        		    			String sql="";
-	        		    	    			
-	        		    			
-	        		//begin create table
-	        		try{
-	        			System.out.println(iloscKolumn);
-	        			sql = "CREATE TABLE "+nazwaPliku+" (id INT NOT NULL PRIMARY KEY AUTO_INCREMENT, ";
-	        			for(int i=0;i<iloscKolumn;i++){
-	        			    rekord[i]=rekord[i].replaceAll(" ", "_");
-	        			    if((i<iloscKolumn-1))sql=sql+rekord[i]+" VARCHAR(300), ";
-	        			    if(i==iloscKolumn-1)sql=sql+rekord[i]+" VARCHAR(300), data TIMESTAMP DEFAULT CURRENT_TIMESTAMP);";
-	        			}
-	        			System.out.println(sql);
-	        			stmt.executeUpdate(sql);
-	        			textfieldSQL.setText("Tabela "+nazwaPliku+" została utworzona.");
-	        		}catch(SQLException e4) {textfieldSQL.setText("Taka "+nazwaPliku+" tabela już istnieje w bazie!!!");}
-	        		//end create table
-	        				
-	        		    			
+	        		 		
 	        		    			
 	        		sql="SHOW COLUMNS FROM "+nazwaPliku+";";
 	        		ResultSet rs = stmt.executeQuery(sql);
